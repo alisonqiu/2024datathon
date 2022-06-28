@@ -1,0 +1,22 @@
+.red {
+    background: rgb(255, 155, 155);
+}
+.green {
+    background: rgb(171, 255, 171);
+}
+
+div#root {
+    margin: 20px;
+}
+
+.point path {
+    opacity: 0.7 !important;
+}
+
+.histogram .point path {
+    opacity: 0.35 !important;
+}
+
+.metrics .point path {
+    opacity: 0.2 !important;
+}
