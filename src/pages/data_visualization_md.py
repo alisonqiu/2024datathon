@@ -15,6 +15,15 @@ dv_select_x_ = ['CREDITSCORE', 'AGE', 'TENURE', 'BALANCE', 'NUMOFPRODUCTS', 'HAS
 
 
 def creation_scatter_dataset(test_dataset:pd.DataFrame):
+    """This function creates the dataset for the scatter plot.  For every column (except Exited) will have a positive and negative version.
+    The positive column will have NaN when the Exited is zero and the negative column will have NaN when the Exited is one.
+
+    Args:
+        test_dataset (pd.DataFrame): the test dataset
+
+    Returns:
+        pd.DataFrame: the datafram
+    """
     scatter_dataset = test_dataset.copy()
 
     for column in scatter_dataset.columns:
@@ -32,6 +41,10 @@ def creation_scatter_dataset(test_dataset:pd.DataFrame):
 
 
 def creation_of_dialog_scatter(column, state=None):
+    """This code generates the Markdown used for the scatter plot. It is going to be used to change 
+    the partial (mini-page that can be reloaded). Selectors are created and the x and y of the graph is determined by changing it
+    here. The dictionary of properties is also changed depending on the column used.
+    """
     if column == 'AGE' or column == 'CREDITSCORE' and state is not None:
         state.dv_dict_overlay = {'barmode':'overlay',"margin":{"t":20}}
     elif state is not None:
@@ -40,15 +53,15 @@ def creation_of_dialog_scatter(column, state=None):
     md = """
 <|layout|columns= 1 1 1|columns[mobile]=1|
 <|
-Type of graph: \n \n <|{dv_graph_selected}|selector|lov={dv_graph_selector}|dropdown|>
+Type of graph \n \n <|{dv_graph_selected}|selector|lov={dv_graph_selector}|dropdown|>
 |>
 
 <|
-Select **x**: \n \n <|{x_selected}|selector|lov={select_x}|dropdown=True|>
+Select **x** \n \n <|{x_selected}|selector|lov={select_x}|dropdown=True|>
 |>
 
 <|
-Select **y**: \n \n <|{y_selected}|selector|lov={select_y}|dropdown=True|>
+Select **y** \n \n <|{y_selected}|selector|lov={select_y}|dropdown=True|>
 |>
 |>
 
@@ -61,6 +74,15 @@ Select **y**: \n \n <|{y_selected}|selector|lov={select_y}|dropdown=True|>
 
 
 def creation_histo_full(test_dataset:pd.DataFrame):
+    """This function creates the dataset for the histogram plot.  For every column (except Exited) will have a positive and negative version.
+    The positive column will have NaN when the Exited is zero and the negative column will have NaN when the Exited is one. 
+
+    Args:
+        test_dataset (pd.DataFrame): the test dataset
+
+    Returns:
+        pd.DataFrame: the Dataframe used to display the Histogram
+    """
     histo_full = test_dataset.copy()
     # create a deterministic oversampling to have the same number of points for each class
     histo_1 = histo_full.loc[histo_full['EXITED'] == 1]    
@@ -79,6 +101,10 @@ def creation_histo_full(test_dataset:pd.DataFrame):
 
 
 def creation_of_dialog_histogram(column, state=None):
+    """This code generates the Markdown used for the histogram plot. It is going to be used to change 
+    the partial (mini-page that can be reloaded). Selectors are created and the x of the graph is determined by changing it
+    here. The dictionary of properties is also changed depending on the column used.
+    """
     if column == 'AGE' or column == 'CREDITSCORE' and state is not None:
         state.dv_dict_overlay = {'barmode':'overlay',"margin":{"t":20}}
     elif state is not None:

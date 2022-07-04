@@ -27,8 +27,6 @@ PATH_TO_TABLE = str(tempdir / "table.csv")
 Config.configure_global_app(clean_entities_enabled=True)
 tp.clean_all_entities()
 
-
-
 ##############################################################################################################################
 # Execution of the scenario
 ##############################################################################################################################
@@ -41,7 +39,7 @@ def create_first_scenario(scenario_cfg):
 create_first_scenario(scenario_cfg)
 
 # ############################################################################################################################
-# Values from the scenario can be read
+# Initialization - Values from the scenario can be read
 ##############################################################################################################################
 forecast_values_baseline = scenario.pipelines['pipeline_baseline'].forecast_dataset.read()
 forecast_values = scenario.pipelines['pipeline_model'].forecast_dataset.read()
@@ -60,7 +58,7 @@ select_y = select_x
 y_selected = select_y[1]
 
 ##############################################################################################################################
-# creation of a dataset that resume the results that will be used in a chart
+# Initialization - Creation of a dataset that resume the results that will be used in a chart
 ##############################################################################################################################
 from pages.main_dialog import *
 
@@ -76,16 +74,21 @@ true_series = values['Historical']
 scatter_dataset_pred = creation_scatter_dataset_pred(test_dataset,forecast_series)
 histo_full_pred = creation_histo_full_pred(test_dataset,forecast_series)
 
+histo_full = creation_histo_full(test_dataset)
+scatter_dataset = creation_scatter_dataset(test_dataset)
+
 features_table = scenario.pipelines['pipeline_train_baseline'].feature_importance.read()
 
 # Comparison of pipelines
+# a generic code to take the correct pipelines
 pipelines_to_compare = [pipeline for pipeline in scenario.pipelines if 'train' not in pipeline and 'preprocessing' not in pipeline]
 
 accuracy_graph, f1_score_graph, score_auc_graph = compare_models_baseline(scenario, pipelines_to_compare) # comes from the compare_models.py
 
 ##############################################################################################################################
-# creation of a pie chart to see the accuracy of the model that will be shown and also the distribution of the classes
+# Initialization - Creation of a pie chart to see the accuracy of the model that will be shown and also the distribution of the classes
 ##############################################################################################################################
+# calculates the metrics for the 'baseline' model
 (number_of_predictions,
  accuracy, f1_score, score_auc,
  number_of_good_predictions,
@@ -100,7 +103,7 @@ distrib_class = pd.DataFrame({"values": [len(values[values["Historical"]==0]),le
                               "labels" : ["Stayed", "Exited"]})
 
 ##############################################################################################################################
-# creation of the False/positive/negative/true table that will be shown
+# Initialization - Creation of the False/positive/negative/true table that will be shown
 ##############################################################################################################################
 
 score_table = pd.DataFrame({"Score":["Predicted stayed", "Predicted exited"],
@@ -111,16 +114,17 @@ pie_confusion_matrix = pd.DataFrame({"values": [tp_,tn_,fp_,fn_],
                               "labels" : ["True Positive","True Negative","False Positive",  "False Negative"]})
 
 ##############################################################################################################################
-# Creation of the graphical user interface (state)
+# Initialization - Creation of the graphical user interface (state)
 ##############################################################################################################################
 
-
-# it is a markdown in the form of a markdown file
-# variables between {} are the values of the code that can also be changed in runtime
+# The list of pages that will be shown in the menu at the left of the page
 menu_lov = [("Data Visualization", Icon('images/histogram_menu.svg', 'Data Visualization')),
-            ("Model Manager",Icon('images/model.svg', 'Model Manager')),
-            ("Compare Models",Icon('images/compare.svg', 'Compare Models')),
-            ('Databases',Icon('images/Datanode.svg', 'Databases'))]
+            ("Model Manager", Icon('images/model.svg', 'Model Manager')),
+            ("Compare Models", Icon('images/compare.svg', 'Compare Models')),
+            ('Databases', Icon('images/Datanode.svg', 'Databases'))]
+
+width_plotly = "450px"
+height_plotly = "450px"
 
 page_markdown = """
 <|toggle|theme|>
@@ -138,16 +142,11 @@ page_markdown = """
 """ + cm_compare_models_md + """
 |>
 
-
-
 <|part|render={page == 'Databases'}|
 """ + db_databases_md + """
 |>
 
 """
-
-width_plotly = "450px"
-height_plotly = "450px"
 
 # the initial page is the "Scenario Manager" page
 page = "Data Visualization"
@@ -155,9 +154,9 @@ def menu_fct(state,var_name:str,fct,var_value):
     """Functions that is called when there is a change in the menu control
 
     Args:
-        state (_type_): the state object of Taipy
+        state : the state object of Taipy
         var_name (str): the changed variable name 
-        var_value (_type_): the changed variable value
+        var_value (obj): the changed variable value
     """
     # we change the value of the state.page variable in order to render the correct page
     try :
@@ -167,10 +166,7 @@ def menu_fct(state,var_name:str,fct,var_value):
     pass
 
 
-histo_full = creation_histo_full(test_dataset)
-scatter_dataset = creation_scatter_dataset(test_dataset)
-
-# for prediction table dialog > style
+# Function for the prediction table. Bad predictions will be red and good predictions will be green (css class)
 def get_style(state, index, row):
     return 'red' if row['Historical']!=row['Forecast'] else 'green'
 
@@ -178,6 +174,8 @@ def get_style(state, index, row):
 ##############################################################################################################################
 # Creation of the entire markdown
 ##############################################################################################################################
+
+
 # dialog_md is found in main_dialog.py
 # the other are found in the dialogs folder
 entire_markdown = page_markdown + dialog_md
@@ -193,21 +191,35 @@ partial_scatter_pred = gui.add_partial(creation_of_dialog_scatter_pred(x_selecte
 partial_histo_pred = gui.add_partial(creation_of_dialog_histogram_pred(x_selected))
 
 def update_partial_charts(state):
+    """This function updates 4 partials containing charts and selectors. Partials are a mini-page 
+    that can be reloaded in runtime with the functions below. They are reloaded in order to change the 
+    content of the charts.
+
+    Args:
+        state: object containing all the variables used in the GUI
+    """
     state.partial_scatter.update_content(state, creation_of_dialog_scatter(state.x_selected, state))
     state.partial_histo.update_content(state, creation_of_dialog_histogram(state.x_selected, state))
     
     state.partial_scatter_pred.update_content(state, creation_of_dialog_scatter_pred(state.x_selected, state))
     state.partial_histo_pred.update_content(state, creation_of_dialog_histogram_pred(state.x_selected, state))
 
+
 ##############################################################################################################################
 # Updating displayed variables
 ##############################################################################################################################
 
 
-def update_variables(state,pipeline):
+def update_variables(state, pipeline):
+    """This function updates the different variables and dataframes used in the application.
+
+    Args:
+        state: object containing all the variables used in the GUI
+        pipeline (str): the name of the pipeline used to update the variables
+    """
+    global scenario
     pipeline_str = 'pipeline_'+pipeline
     
-    global scenario
     if pipeline == 'baseline':
         state.values = scenario.pipelines[pipeline_str].results.read()
     else:
@@ -228,6 +240,18 @@ def update_variables(state,pipeline):
 
 
 def update_charts(state, pipeline_str, number_of_good_predictions, number_of_false_predictions, fp_, tp_, fn_, tn_):
+    """This function updates all the charts of the GUI.
+
+    Args:
+        state: object containing all the variables used in the GUI
+        pipeline_str (str): the name of the pipeline shown
+        number_of_good_predictions (int): number of good predictions
+        number_of_false_predictions (int): number of false predictions
+        fp_ (float): false positive rate
+        tp_ (float): true positive rate
+        fn_ (float): false negative rate
+        tn_ (float): true negative rate
+    """
     state.roc_dataset = scenario.pipelines[pipeline_str].roc_data.read()
     
     if 'model' in pipeline_str:
@@ -261,7 +285,14 @@ def update_charts(state, pipeline_str, number_of_good_predictions, number_of_fal
 
 # the other functions are in the right folder in frontend/dialogs
 def on_change(state, var_name, var_value):
-    if var_name == 'x_selected' or var_name == 'y_selected': ##### why y has to be updated like that
+    """This function is called when a variable is changed in the GUI.
+
+    Args:
+        state : object containing all the variables used in the GUI
+        var_name (str): name of the changed variable
+        var_value (obj): value of the changed variable
+    """
+    if var_name == 'x_selected' or var_name == 'y_selected':
         update_partial_charts(state)
     
     if var_name == 'mm_algorithm_selected':
@@ -275,15 +306,22 @@ def on_change(state, var_name, var_value):
         handle_temp_csv_path(state)
            
     if var_name == 'page' and var_value != 'Databases':
-        delete_temp_csv(state)
+        delete_temp_csv()
 
 
 
-def delete_temp_csv(state):
+def delete_temp_csv():
+    """This function deletes the temporary csv file."""
     if os.path.exists(PATH_TO_TABLE):
         os.remove(PATH_TO_TABLE)
 
 def handle_temp_csv_path(state):
+    """This function checks if the temporary csv file exists. If it does, it is deleted. Then, the temporary csv file
+    is created for the right table
+
+    Args:
+        state: object containing all the variables used in the GUI
+    """
     if os.path.exists(PATH_TO_TABLE):
         os.remove(PATH_TO_TABLE)
     if state.db_table_selected == 'Test Dataset':
@@ -297,10 +335,8 @@ def handle_temp_csv_path(state):
     
 
 ##############################################################################################################################
-# Running the state
+# Running the Gui
 ##############################################################################################################################
-# we run the page, it will start a client
-
 if __name__ == '__main__':
     gui.run(title="Churn classification",
     		host='0.0.0.0',

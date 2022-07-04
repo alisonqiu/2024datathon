@@ -141,7 +141,6 @@ def forecast_baseline(test_dataset: pd.DataFrame, trained_model: LogisticRegress
     return predictions
 
 def roc_from_scratch(probabilities, test_dataset, partitions=100):
-    
     print("     Calculation of the ROC curve...")
     y_test = test_dataset.iloc[:,-1]
     
@@ -223,5 +222,4 @@ def create_results(forecast_values,test_dataset):
     index_series = pd.Series(range(len(true_series)), index=test_dataset.index, name="Id")
     
     results = pd.concat([index_series, forecast_series_proba, forecast_series, true_series], axis=1)
-    
     return results

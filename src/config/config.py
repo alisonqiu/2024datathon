@@ -72,8 +72,8 @@ results = Config.configure_data_node(id="results",
 # Creation of the tasks
 ##############################################################################################################################
 
-# the task will make the link between the input datanode 
-# and the output datanode while executing the function
+# the task will make the link between the input data node 
+# and the output data node while executing the function
 
 # initial_dataset --> preprocess dataset --> preprocessed_dataset
 task_preprocess_dataset = Config.configure_task(id="preprocess_dataset",
@@ -140,27 +140,27 @@ task_create_results = Config.configure_task(id="task_create_results",
 
 # configuration of the pipeline and scenario
 pipeline_preprocessing = Config.configure_pipeline(id="pipeline_preprocessing", task_configs=[task_preprocess_dataset,
-                                                                           task_create_train_test])
+                                                                                              task_create_train_test])
 
 pipeline_train_baseline = Config.configure_pipeline(id="pipeline_train_baseline", task_configs=[task_train_model_baseline])
 pipeline_train_model = Config.configure_pipeline(id="pipeline_train_model", task_configs=[task_train_model])
 
 pipeline_model = Config.configure_pipeline(id="pipeline_model", task_configs=[task_forecast,
-                                                                         task_roc,
-                                                                         task_create_metrics,
-                                                                         task_create_results])
+                                                                              task_roc,
+                                                                              task_create_metrics,
+                                                                              task_create_results])
 
 pipeline_baseline = Config.configure_pipeline(id="pipeline_baseline", task_configs=[task_forecast_baseline,
-                                                                                task_roc_baseline,
-                                                                                task_create_metrics,
-                                                                                task_create_results])
+                                                                                    task_roc_baseline,
+                                                                                    task_create_metrics,
+                                                                                    task_create_results])
 
 # the scenario will run the pipelines
 scenario_cfg = Config.configure_scenario(id="churn_classification",
-                                      pipeline_configs=[pipeline_preprocessing, 
-                                                        pipeline_train_baseline, pipeline_train_model,
-                                                        pipeline_model,pipeline_baseline],
-                                      frequency=Frequency.WEEKLY)
+                                         pipeline_configs=[pipeline_preprocessing, 
+                                                           pipeline_train_baseline, pipeline_train_model,
+                                                           pipeline_model,pipeline_baseline],
+                                         frequency=Frequency.WEEKLY)
 
 
 

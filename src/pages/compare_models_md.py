@@ -25,6 +25,15 @@ cm_compare_models_md = """
 """
 
 def c_update_metrics(scenario, pipeline):
+    """This function updates the metrics of a scenario using a pipeline
+
+    Args:
+        scenario (scenario): the selected scenario
+        pipeline (str): the name of the selected pipeline
+
+    Returns:
+        obj: a number of values, lists that represent the metrics
+    """
     metrics = scenario.pipelines[pipeline].metrics.read()
 
     number_of_predictions = metrics['number_of_predictions']
@@ -45,7 +54,18 @@ def c_update_metrics(scenario, pipeline):
     return number_of_predictions, accuracy, f1_score, score_auc, number_of_good_predictions, number_of_false_predictions, fp_, tp_, fn_, tn_
 
 
-def compare_charts(accuracies,f1_scores,scores_auc,names):
+def compare_charts(accuracies, f1_scores, scores_auc, names):
+    """This funcion creates the pandas Dataframes (charts) used in the model comparison page
+
+    Args:
+        accuracies (list): list of accuracies
+        f1_scores (list): list of f1 scores
+        scores_auc (list): list of auc scores
+        names (list): list of scenario names
+
+    Returns:
+        pd.DataFrame: the resulting three pd.DataFrame
+    """
     accuracy_graph = pd.DataFrame(create_metric_dict(accuracies, "Accuracy", names))
     f1_score_graph = pd.DataFrame(create_metric_dict(f1_scores, "F1 Score", names))
     score_auc_graph = pd.DataFrame(create_metric_dict(scores_auc, "AUC Score", names))
@@ -53,6 +73,15 @@ def compare_charts(accuracies,f1_scores,scores_auc,names):
     return accuracy_graph, f1_score_graph, score_auc_graph
 
 def compare_models_baseline(scenario,pipelines):
+    """This function creates the objects for the pipeline comparison
+
+    Args:
+        scenario (scenario): the selected scenario
+        pipelines (str): the name of the selected pipeline
+
+    Returns:
+        pd.DataFrame: the resulting three pd.DataFrame
+    """
     accuracies = []
     f1_scores = []
     scores_auc = []
@@ -65,11 +94,21 @@ def compare_models_baseline(scenario,pipelines):
         scores_auc.append(score_auc)
         names.append(pipeline[9:])
         
-    accuracy_graph,f1_score_graph, score_auc_graph = compare_charts(accuracies,f1_scores,scores_auc, names)
+    accuracy_graph,f1_score_graph, score_auc_graph = compare_charts(accuracies, f1_scores, scores_auc, names)
     return accuracy_graph, f1_score_graph, score_auc_graph
     
 
 def create_metric_dict(metric, metric_name, names):
+    """This function creates a dictionary of metrics for mutliple pipelines that will be used in a Dataframe shown on the Gui
+
+    Args:
+        metric (list): the value of the metric
+        metric_name (str): the name of the metric
+        names (list): list of scenario names
+
+    Returns:
+        dict: dicitonary used for a pandas Dataframe
+    """
     metric_dict = {}
     initial_list = [0]*len(names)
     

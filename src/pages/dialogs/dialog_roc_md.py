@@ -1,10 +1,10 @@
 # Roc Dialog
 dr_show_roc = False
 
-def show_roc_fct(gui):
-    gui.dr_show_roc = True  
-def delete_dialog_roc(gui):
-    gui.dr_show_roc = False
+def show_roc_fct(state):
+    state.dr_show_roc = True  
+def delete_dialog_roc(state):
+    state.dr_show_roc = False
 
 dialog_roc = """
 <center>

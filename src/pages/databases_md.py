@@ -7,12 +7,14 @@ db_confusion_matrix_md = """
 |>
 """
 
+# Table for the train dataset
 db_train_dataset_md = """
 <|part|render={db_table_selected=='Training Dataset'}|
 <|{train_dataset}|table|width=1400px|height=560px|>
 |>
 """
 
+# Table for the forecast dataset
 db_forecast_dataset_md = """
 <|part|render={db_table_selected=='Forecast Dataset'}|
 <center>
@@ -21,17 +23,18 @@ db_forecast_dataset_md = """
 |>
 """
 
-
+# Table for the test dataset
 db_test_dataset_md = """
 <|part|render={db_table_selected=='Test Dataset'}|
 <|{test_dataset}|table|width=1400px|height=560px|>
 |>
 """
 
-
+# Selector to select the table to show
 db_table_selector = ['Training Dataset', 'Test Dataset', 'Forecast Dataset', 'Confusion Matrix']
 db_table_selected = db_table_selector[0]
 
+# Aggregation of the strings to create the complete page
 db_databases_md = """
 # Databases
 
