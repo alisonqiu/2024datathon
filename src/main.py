@@ -7,7 +7,7 @@ from taipy.gui import Gui, Icon
 
 # get the config
 from config.config import scenario_cfg
-from taipy.core.config.config import Config
+from taipy import Config
 
 import os
 

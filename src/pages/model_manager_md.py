@@ -105,7 +105,7 @@ metrics_md = """
 <|layout|columns=1 1 1|columns[mobile]=1|
 
 <|
-<|{accuracy}|indicator|value={accuracy}|min=0|max=1|width=200px|>
+<|{accuracy}|indicator|value={accuracy}|min=0|max=1|>
 <center>
 **Model accuracy**
 </center>
@@ -113,7 +113,7 @@ metrics_md = """
 |>
 
 <|
-<|{score_auc}|indicator|value={score_auc}|min=0|max=1|width=200px|>
+<|{score_auc}|indicator|value={score_auc}|min=0|max=1|>
 <center>
 **Model AUC**
 </center>
@@ -121,7 +121,7 @@ metrics_md = """
 |>
 
 <|
-<|{f1_score}|indicator|value={f1_score}|min=0|max=1|width=200px|>
+<|{f1_score}|indicator|value={f1_score}|min=0|max=1|>
 <center>
 **Model F1-score**
 </center>
