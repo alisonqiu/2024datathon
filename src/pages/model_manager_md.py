@@ -109,7 +109,7 @@ metrics_md = """
 <center>
 **Model accuracy**
 </center>
-<|{pie_plotly}|chart|x=values|label=labels|title=Accuracy of predictions model|height={height_plotly}|width=100%|type=pie|layout={mm_pie_color_dict_2}|>
+<|{pie_plotly}|chart|title=Accuracy of predictions model|values=values|labels=labels|height={height_plotly}|width=100%|type=pie|layout={mm_pie_color_dict_2}|>
 |>
 
 <|
@@ -117,7 +117,7 @@ metrics_md = """
 <center>
 **Model AUC**
 </center>
-<|{pie_confusion_matrix}|chart|x=values|label=labels|title=Confusion Matrix|height={height_plotly}|width=100%|type=pie|layout={mm_pie_color_dict_4}|>
+<|{pie_confusion_matrix}|chart|title=Confusion Matrix|values=values|labels=labels|height={height_plotly}|width=100%|type=pie|layout={mm_pie_color_dict_4}|>
 |>
 
 <|
@@ -125,7 +125,7 @@ metrics_md = """
 <center>
 **Model F1-score**
 </center>
-<|{distrib_class}|chart|x=values|label=labels|title=Distribution between Exited and Stayed|height={height_plotly}|width=100%|type=pie|layout={mm_pie_color_dict_2}|>
+<|{distrib_class}|chart|title=Distribution between Exited and Stayed|values=values|labels=labels|height={height_plotly}|width=100%|type=pie|layout={mm_pie_color_dict_2}|>
 |>
 
 |>

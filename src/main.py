@@ -3,7 +3,7 @@ import pandas as pd
 
 # taipy functions
 import taipy as tp
-from taipy.gui import Gui, Icon
+from taipy.gui import Gui, Icon, navigate
 
 # get the config
 from config.config import scenario_cfg
@@ -30,6 +30,8 @@ tp.clean_all_entities()
 ##############################################################################################################################
 # Execution of the scenario
 ##############################################################################################################################
+
+tp.Core().run()
 
 def create_first_scenario(scenario_cfg):
     global scenario
@@ -129,23 +131,6 @@ height_plotly = "450px"
 page_markdown = """
 <|toggle|theme|>
 <|menu|label=Menu|lov={menu_lov}|on_action=menu_fct|>
-
-<|part|render={page == 'Data Visualization'}|
-""" + dv_data_visualization_md + """
-|>
-
-<|part|render={page == 'Model Manager'}|
-""" + mm_model_manager_md + """
-|>
-
-<|part|render={page == 'Compare Models'}|
-""" + cm_compare_models_md + """
-|>
-
-<|part|render={page == 'Databases'}|
-""" + db_databases_md + """
-|>
-
 """
 
 # the initial page is the "Scenario Manager" page
@@ -161,6 +146,7 @@ def menu_fct(state,var_name:str,fct,var_value):
     # we change the value of the state.page variable in order to render the correct page
     try :
         state.page = var_value['args'][0]
+        navigate(state, state.page.replace(" ", "-"))
     except:
         print("Warning : No args were found")
     pass
@@ -174,6 +160,12 @@ def get_style(state, index, row):
 ##############################################################################################################################
 # Creation of the entire markdown
 ##############################################################################################################################
+pages = {
+         "/":page_markdown+dialog_md,
+         "Data-Visualization": dv_data_visualization_md,
+         "Model-Manager": mm_model_manager_md, 
+         "Compare-Models": cm_compare_models_md,
+         "Databases": db_databases_md,}
 
 
 # dialog_md is found in main_dialog.py
@@ -181,7 +173,7 @@ def get_style(state, index, row):
 entire_markdown = page_markdown + dialog_md
 
 # the object that will be used to generate the page
-gui = Gui(page=entire_markdown, css_file='main')
+gui = Gui(pages=pages, css_file='main')
 dialog_partial_roc = gui.add_partial(dialog_roc)
 
 partial_scatter = gui.add_partial(creation_of_dialog_scatter(x_selected))
