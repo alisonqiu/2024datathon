@@ -48,7 +48,6 @@ db_databases_md = """
 |>
 
 <br/>
-<br/>
 <|{PATH_TO_TABLE}|file_download|name=table.csv|label=Download table|>
 |>
 """ + db_test_dataset_md + db_confusion_matrix_md + db_train_dataset_md + db_forecast_dataset_md
