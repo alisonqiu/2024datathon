@@ -4,6 +4,7 @@
 ```
 git clone https://github.com/Avaiga/demo-churn-classification.git
 cd demo-churn-classification
+cd src
 pip install -r requirements.txt
 ```
 
