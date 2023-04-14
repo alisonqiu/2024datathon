@@ -48,31 +48,6 @@ def creation_scatter_dataset_pred(test_dataset:pd.DataFrame, forecast_series:pd.
     return scatter_dataset
 
 
-def creation_of_dialog_scatter_pred(column, state=None):
-    """This code generates the Markdown used for the scatter plot for the predictions. It is going to be used to change 
-    the partial (mini-page that can be reloaded). Selectors are created and the x and y of the graph is determined by changing it
-    here. The dictionary of properties is also changed depending on the column used.
-    """
-    if column == 'AGE' or column == 'CREDITSCORE' and state is not None:
-        state.dv_dict_overlay = {'barmode':'overlay',"margin":{"t":20}}
-    elif state is not None:
-        state.dv_dict_overlay = {"margin":{"t":20}}
-        
-    md = """
-<|layout|columns= 1 1|columns[mobile]=1|
-<|
-Select **x** \n \n <|{x_selected}|selector|lov={select_x}|dropdown|>
-|>
-
-<|
-Select **y** \n \n <|{y_selected}|selector|lov={select_y}|dropdown|>
-|>
-|>
-
-<|{scatter_dataset_pred}|chart|x="""+column+"""|y[1]={y_selected+'_pos'}|y[2]={y_selected+'_neg'}|color[1]=red|color[2]=green|name[1]=Bad prediction|name[2]=Good prediction|height={mm_height_histo}|width={dv_width_histo}|mode=markers|type=scatter|layout={dv_dict_overlay}|>
-
-"""
-    return md
 
 
 def creation_histo_full_pred(test_dataset:pd.DataFrame,forecast_series:pd.Series):
@@ -136,26 +111,6 @@ features_md = """
 <|{features_table}|chart|type=bar|y=Features|x=Importance|orientation=h|layout={mm_margin_features}|>
 """
 
-def creation_of_dialog_histogram_pred(column, state=None):
-    """This code generates the Markdown used for the scatter plot. It is going to be used to change 
-    the partial (mini-page that can be reloaded). The selector is created and the x of the graph is determined by changing it
-    here. The dictionary of properties is also changed depending on the column used.
-    """
-    if column == 'AGE' or column == 'CREDITSCORE' and state is not None:
-        state.dv_dict_overlay = {'barmode':'overlay',"margin":{"t":20}}
-    elif state is not None:
-        state.dv_dict_overlay = {"margin":{"t":20}}
-        
-    md = """
-<|
-Select **x** \n \n <|{x_selected}|selector|lov={select_x}|dropdown=True|>
-|>
-
-<|{histo_full_pred[['"""+column+"""','"""+column+"""_neg','PREDICTION']]}|chart|type=histogram|x[1]="""+column+"""|x[2]="""+column+"""_neg|y=PREDICTION|label=PREDICTION|color[1]=red|color[2]=green|name[1]=Bad prediction|name[2]=Good prediction|height={mm_height_histo}|width={dv_width_histo}|layout={dv_dict_overlay}|class_name=histogram|>
-
-"""
-    return md
-
 
 mm_model_manager_md = """
 # Model Manager
@@ -168,15 +123,11 @@ Type of graph
 <|{mm_graph_selected_scenario}|selector|lov={mm_graph_selector_scenario}|dropdown=True|>
 
 <br/>
-<br/>
-<center>
-<|show roc|button|on_action=show_roc_fct|>
-</center>
+<center> <|show roc|button|on_action={lambda s: s.assign("dr_show_roc", True)}|> </center>
 
 <br/>
-<br/>
 <center>
-**Number of predictions: ** *<|{number_of_predictions}|>*
+**Number of predictions:** <|{number_of_predictions}|>
 </center>
 |>
 
@@ -188,8 +139,26 @@ Type of graph
 """+features_md+"""
 |>
 
-<|part|render={mm_graph_selected_scenario == 'Scatter'}|partial={partial_scatter_pred}|>
+<|part|render={dv_graph_selected == 'Histogram'}|
+<|layout|columns= 1 1 1|columns[mobile]=1|
+Select type of graph : <br/> <|{dv_graph_selected}|selector|lov={dv_graph_selector}|dropdown|>
 
-<|part|render={mm_graph_selected_scenario == 'Histogram'}|partial={partial_histo_pred}|>
+Select **x**: <br/>  <|{x_selected}|selector|lov={select_x}|dropdown=True|>
+|>
 
+
+<|{histo_full_pred}|chart|type=histogram|properties={properties_histo_full}|rebuild|y=PREDICTION|label=PREDICTION|color[1]=red|color[2]=green|name[1]=Good Predictions|name[2]=Bad Predictions|height={dv_height_histo}|width={dv_width_histo}|layout={dv_dict_overlay}|class_name=histogram|>
+|>
+
+<|part|render={dv_graph_selected == 'Scatter'}|
+<|layout|columns= 1 1 1|columns[mobile]=1|
+Type of graph <br/> <|{dv_graph_selected}|selector|lov={dv_graph_selector}|dropdown|>
+
+Select **x** <br/> <|{x_selected}|selector|lov={select_x}|dropdown=True|>
+
+Select **y** <br/> <|{y_selected}|selector|lov={select_y}|dropdown=True|>
+|>
+
+<|{scatter_dataset_pred}|chart|properties={properties_scatter_dataset}|rebuild|color[1]=red|color[2]=green|name[1]=Bad prediction|name[2]=Good prediction|height={dv_height_histo}|width={dv_width_histo}|mode=markers|type=scatter|layout={dv_dict_overlay}|>
+|>
 """

@@ -20,13 +20,6 @@ tempdir = pathlib.Path(".tmp")
 tempdir.mkdir(exist_ok=True)
 PATH_TO_TABLE = str(tempdir / "table.csv")
 
-###############################################################################
-# we clean the data storage
-###############################################################################
-
-Config.configure_global_app(clean_entities_enabled=True)
-tp.clean_all_entities()
-
 ##############################################################################################################################
 # Execution of the scenario
 ##############################################################################################################################
@@ -167,6 +160,9 @@ pages = {
          "Compare-Models": cm_compare_models_md,
          "Databases": db_databases_md,}
 
+def on_init(state):
+    update_histogram_and_scatter(state.x_selected, state)
+
 
 # dialog_md is found in main_dialog.py
 # the other are found in the dialogs folder
@@ -176,27 +172,8 @@ entire_markdown = page_markdown + dialog_md
 gui = Gui(pages=pages, css_file='main')
 dialog_partial_roc = gui.add_partial(dialog_roc)
 
-partial_scatter = gui.add_partial(creation_of_dialog_scatter(x_selected))
-partial_histo = gui.add_partial(creation_of_dialog_histogram(x_selected))
 
-partial_scatter_pred = gui.add_partial(creation_of_dialog_scatter_pred(x_selected))
-partial_histo_pred = gui.add_partial(creation_of_dialog_histogram_pred(x_selected))
-
-def update_partial_charts(state):
-    """This function updates 4 partials containing charts and selectors. Partials are a mini-page 
-    that can be reloaded in runtime with the functions below. They are reloaded in order to change the 
-    content of the charts.
-
-    Args:
-        state: object containing all the variables used in the GUI
-    """
-    state.partial_scatter.update_content(state, creation_of_dialog_scatter(state.x_selected, state))
-    state.partial_histo.update_content(state, creation_of_dialog_histogram(state.x_selected, state))
     
-    state.partial_scatter_pred.update_content(state, creation_of_dialog_scatter_pred(state.x_selected, state))
-    state.partial_histo_pred.update_content(state, creation_of_dialog_histogram_pred(state.x_selected, state))
-
-
 ##############################################################################################################################
 # Updating displayed variables
 ##############################################################################################################################
@@ -212,14 +189,10 @@ def update_variables(state, pipeline):
     global scenario
     pipeline_str = 'pipeline_'+pipeline
     
-    if pipeline == 'baseline':
-        state.values = scenario.pipelines[pipeline_str].results.read()
-    else:
-        state.values = scenario.pipelines[pipeline_str].results.read()
+    state.values = scenario.pipelines[pipeline_str].results.read()
         
     state.forecast_series = state.values['Forecast']
     state.true_series = state.values["Historical"]
-    
     
     (state.number_of_predictions,
     state.accuracy, state.f1_score, state.score_auc,
@@ -285,27 +258,20 @@ def on_change(state, var_name, var_value):
         var_value (obj): value of the changed variable
     """
     if var_name == 'x_selected' or var_name == 'y_selected':
-        update_partial_charts(state)
+        update_histogram_and_scatter(state.x_selected, state)
+
     
     if var_name == 'mm_algorithm_selected':
         if var_value == 'Baseline':
             update_variables(state,'baseline')
         if var_value == 'ML':
             update_variables(state,'model')
-        
+    
     if (var_name == 'mm_algorithm_selected' or var_name == "db_table_selected" and state.page == 'Databases') or (var_name == 'page' and var_value == 'Databases'):
         # if we are on the 'Databases' page, we have to create an temporary csv file
         handle_temp_csv_path(state)
-           
-    if var_name == 'page' and var_value != 'Databases':
-        delete_temp_csv()
+    
 
-
-
-def delete_temp_csv():
-    """This function deletes the temporary csv file."""
-    if os.path.exists(PATH_TO_TABLE):
-        os.remove(PATH_TO_TABLE)
 
 def handle_temp_csv_path(state):
     """This function checks if the temporary csv file exists. If it does, it is deleted. Then, the temporary csv file
@@ -314,8 +280,6 @@ def handle_temp_csv_path(state):
     Args:
         state: object containing all the variables used in the GUI
     """
-    if os.path.exists(PATH_TO_TABLE):
-        os.remove(PATH_TO_TABLE)
     if state.db_table_selected == 'Test Dataset':
         state.test_dataset.to_csv(PATH_TO_TABLE, sep=';')
     if state.db_table_selected == 'Confusion Matrix':
@@ -330,11 +294,4 @@ def handle_temp_csv_path(state):
 # Running the Gui
 ##############################################################################################################################
 if __name__ == '__main__':
-    gui.run(title="Churn classification",
-    		host='0.0.0.0',
-    		port=os.environ.get('PORT', '5050'),
-    		dark_mode=False)
-else:
-    app = gui.run(title="Churn classification",
-    	         dark_mode=False,
-                 run_server=False)
+    gui.run(title="Churn classification")

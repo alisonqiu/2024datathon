@@ -1,17 +1,14 @@
-.red {
-    background: rgb(255, 155, 155);
+.red td{
+    background: rgb(255, 155, 155) !important;
 }
-.green {
-    background: rgb(171, 255, 171);
+.green td{
+    background: rgb(171, 255, 171) !important;
 }
 
 div#root {
     margin: 20px;
 }
 
-.point path {
-    opacity: 0.7 !important;
-}
 
 .histogram .point path {
     opacity: 0.35 !important;
