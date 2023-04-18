@@ -6,13 +6,12 @@ dv_graph_selector = ['Histogram','Scatter']
 dv_graph_selected = dv_graph_selector[0]
 
 # Histograms dialog
-dv_width_histo = "100%"
-dv_height_histo = 600
-
-dv_dict_overlay = {'barmode':'overlay', "margin":{"t":20}}
+dv_dict_overlay = {'barmode':'overlay'}
 
 dv_select_x_ = ['CREDITSCORE', 'AGE', 'TENURE', 'BALANCE', 'NUMOFPRODUCTS', 'HASCRCARD', 'ISACTIVEMEMBER', 'ESTIMATEDSALARY', 'GEOGRAPHY_FRANCE', 'GEOGRAPHY_GERMANY', 'GEOGRAPHY_SPAIN', 'GENDER_MALE']
 
+properties_histo_full = {}
+properties_scatter_dataset = {}
 
 def creation_scatter_dataset(test_dataset:pd.DataFrame):
     """This function creates the dataset for the scatter plot.  For every column (except Exited) will have a positive and negative version.
@@ -40,11 +39,31 @@ def creation_scatter_dataset(test_dataset:pd.DataFrame):
     return scatter_dataset
 
 
+def creation_histo_full(test_dataset:pd.DataFrame):
+    """This function creates the dataset for the histogram plot.  For every column (except Exited) will have a positive and negative version.
+    The positive column will have NaN when the Exited is zero and the negative column will have NaN when the Exited is one. 
+
+    Args:
+        test_dataset (pd.DataFrame): the test dataset
+
+    Returns:
+        pd.DataFrame: the Dataframe used to display the Histogram
+    """
+    histo_full = test_dataset.copy()
+    
+    for column in histo_full.columns:
+        column_neg = str(column)+'_neg'
+        histo_full[column_neg] = histo_full[column]
+        histo_full.loc[(histo_full['EXITED'] == 1),column_neg] = np.NaN
+        histo_full.loc[(histo_full['EXITED'] == 0),column] = np.NaN
+        
+    return histo_full
+
 def update_histogram_and_scatter(column, state=None):
     if column == 'AGE' or column == 'CREDITSCORE' and state is not None:
-        state.dv_dict_overlay = {'barmode':'overlay',"margin":{"t":20}}
+        state.dv_dict_overlay = {'barmode':'overlay'}
     elif state is not None:
-        state.dv_dict_overlay = {"margin":{"t":20}}
+        state.dv_dict_overlay = {}
 
     if state is not None:
         state.properties_scatter_dataset =  {"x":column,
@@ -59,62 +78,28 @@ def update_histogram_and_scatter(column, state=None):
         state.histo_full_pred = state.histo_full_pred
 
 
-
-def creation_histo_full(test_dataset:pd.DataFrame):
-    """This function creates the dataset for the histogram plot.  For every column (except Exited) will have a positive and negative version.
-    The positive column will have NaN when the Exited is zero and the negative column will have NaN when the Exited is one. 
-
-    Args:
-        test_dataset (pd.DataFrame): the test dataset
-
-    Returns:
-        pd.DataFrame: the Dataframe used to display the Histogram
-    """
-    histo_full = test_dataset.copy()
-    # create a deterministic oversampling to have the same number of points for each class
-    histo_1 = histo_full.loc[histo_full['EXITED'] == 1]    
-    
-    frames = [histo_full,histo_1,histo_1,histo_1]
-    
-    histo_full = pd.concat(frames, sort=False)
-    
-    for column in histo_full.columns:
-        column_neg = str(column)+'_neg'
-        histo_full[column_neg] = histo_full[column]
-        histo_full.loc[(histo_full['EXITED'] == 1),column_neg] = np.NaN
-        histo_full.loc[(histo_full['EXITED'] == 0),column] = np.NaN
-        
-    return histo_full
-
-properties_histo_full = {}
-properties_scatter_dataset = {}
-
-
-
 dv_data_visualization_md = """
-# Data Visualization
+# Data **Visualization**{: .color-primary}
+<|{dv_graph_selected}|toggle|lov={dv_graph_selector}|>
+
+--------------------------------------------------------------------
 
 <|part|render={dv_graph_selected == 'Histogram'}|
-<|layout|columns= 1 1 1|columns[mobile]=1|
-Select type of graph : <br/> <|{dv_graph_selected}|selector|lov={dv_graph_selector}|dropdown|>
+### Histogram
+<|{x_selected}|selector|lov={select_x}|dropdown=True|label=Select x|>
 
-Select **x**: <br/>  <|{x_selected}|selector|lov={select_x}|dropdown=True|>
-|>
-
-
-<|{histo_full}|chart|type=histogram|properties={properties_histo_full}|rebuild|y=EXITED|label=EXITED|color[1]=red|color[2]=green|name[1]=Exited|name[2]=Stayed|height={dv_height_histo}|width={dv_width_histo}|layout={dv_dict_overlay}|class_name=histogram|>
+<|{histo_full}|chart|type=histogram|properties={properties_histo_full}|rebuild|y=EXITED|label=EXITED|color[1]=red|color[2]=green|name[1]=Exited|name[2]=Stayed|layout={dv_dict_overlay}|height=600px|selected={[-1]}|>
 |>
 
 <|part|render={dv_graph_selected == 'Scatter'}|
-<|layout|columns= 1 1 1|columns[mobile]=1|
-Type of graph <br/> <|{dv_graph_selected}|selector|lov={dv_graph_selector}|dropdown|>
+### Scatter
+<|layout|columns= 1 2|
+<|{x_selected}|selector|lov={select_x}|dropdown|label=Select x|>
 
-Select **x** <br/> <|{x_selected}|selector|lov={select_x}|dropdown=True|>
-
-Select **y** <br/> <|{y_selected}|selector|lov={select_y}|dropdown=True|>
+<|{y_selected}|selector|lov={select_y}|dropdown|label=Select y|>
 |>
 
-<|{scatter_dataset}|chart|properties={properties_scatter_dataset}|rebuild|color[1]=red|color[2]=green|name[1]=Exited|name[2]=Stayed|height={dv_height_histo}|width={dv_width_histo}|mode=markers|type=scatter|layout={dv_dict_overlay}|>
+<|{scatter_dataset}|chart|properties={properties_scatter_dataset}|rebuild|color[1]=red|color[2]=green|name[1]=Exited|name[2]=Stayed|mode=markers|type=scatter|layout={dv_dict_overlay}|height=600px|>
 |>
 
 """

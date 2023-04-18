@@ -1,19 +1,6 @@
-.red td{
-    background: rgb(255, 155, 155) !important;
+.red_color td{
+    background-color: rgb(255, 155, 155) !important;
 }
-.green td{
-    background: rgb(171, 255, 171) !important;
-}
-
-div#root {
-    margin: 20px;
-}
-
-
-.histogram .point path {
-    opacity: 0.35 !important;
-}
-
-.metrics .point path {
-    opacity: 0.2 !important;
+.green_color td{
+    background-color: rgb(171, 255, 171) !important;
 }

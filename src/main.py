@@ -1,5 +1,6 @@
 # basic packages
 import pandas as pd
+import pathlib
 
 # taipy functions
 import taipy as tp
@@ -7,14 +8,8 @@ from taipy.gui import Gui, Icon, navigate
 
 # get the config
 from config.config import scenario_cfg
-from taipy import Config
 
-import os
-
-# import to create the temporary file
-import pathlib
-
-# this path is used to create a temporary file that will allow us to
+# This path is used to create a temporary file that will allow us to
 # download a table in the Datasouces page
 tempdir = pathlib.Path(".tmp")
 tempdir.mkdir(exist_ok=True)
@@ -27,11 +22,11 @@ PATH_TO_TABLE = str(tempdir / "table.csv")
 tp.Core().run()
 
 def create_first_scenario(scenario_cfg):
-    global scenario
     scenario = tp.create_scenario(scenario_cfg)
     tp.submit(scenario)
+    return scenario
     
-create_first_scenario(scenario_cfg)
+scenario = create_first_scenario(scenario_cfg)
 
 # ############################################################################################################################
 # Initialization - Values from the scenario can be read
@@ -53,7 +48,7 @@ select_y = select_x
 y_selected = select_y[1]
 
 ##############################################################################################################################
-# Initialization - Creation of a dataset that resume the results that will be used in a chart
+# Initialization - Creation of a dataset that sums up the results that will be used in a chart
 ##############################################################################################################################
 from pages.main_dialog import *
 
@@ -64,7 +59,6 @@ values = values_baseline.copy()
 
 forecast_series = values['Forecast']
 true_series = values['Historical']
-
 
 scatter_dataset_pred = creation_scatter_dataset_pred(test_dataset,forecast_series)
 histo_full_pred = creation_histo_full_pred(test_dataset,forecast_series)
@@ -83,30 +77,39 @@ accuracy_graph, f1_score_graph, score_auc_graph = compare_models_baseline(scenar
 ##############################################################################################################################
 # Initialization - Creation of a pie chart to see the accuracy of the model that will be shown and also the distribution of the classes
 ##############################################################################################################################
-# calculates the metrics for the 'baseline' model
-(number_of_predictions,
- accuracy, f1_score, score_auc,
- number_of_good_predictions,
- number_of_false_predictions,
- fp_, tp_, fn_, tn_) = c_update_metrics(scenario, 'pipeline_baseline')
+def create_charts(pipeline_str): 
+    # calculates the metrics for the 'baseline' model
+    (number_of_predictions,
+    accuracy, f1_score, score_auc,
+    number_of_good_predictions,
+    number_of_false_predictions,
+    fp_, tp_, fn_, tn_) = c_update_metrics(scenario, pipeline_str)
 
-# pie charts
-pie_plotly = pd.DataFrame({"values": [number_of_good_predictions, number_of_false_predictions],
-                           "labels": ["Correct predictions", "False predictions"]})
+    # pie charts
+    pie_plotly = pd.DataFrame({"values": [number_of_good_predictions, number_of_false_predictions],
+                            "labels": ["Correct predictions", "False predictions"]})
 
-distrib_class = pd.DataFrame({"values": [len(values[values["Historical"]==0]),len(values[values["Historical"]==1])],
-                              "labels" : ["Stayed", "Exited"]})
+    distrib_class = pd.DataFrame({"values": [len(values[values["Historical"]==0]),len(values[values["Historical"]==1])],
+                                "labels" : ["Stayed", "Exited"]})
 
-##############################################################################################################################
-# Initialization - Creation of the False/positive/negative/true table that will be shown
-##############################################################################################################################
+    ##############################################################################################################################
+    # Initialization - Creation of the False/positive/negative/true table that will be shown
+    ##############################################################################################################################
 
-score_table = pd.DataFrame({"Score":["Predicted stayed", "Predicted exited"],
-                            "Stayed": [tn_, fp_],
-                            "Exited" : [fn_, tp_]})
+    score_table = pd.DataFrame({"Score":["Predicted stayed", "Predicted exited"],
+                                "Stayed": [tn_, fp_],
+                                "Exited" : [fn_, tp_]})
 
-pie_confusion_matrix = pd.DataFrame({"values": [tp_,tn_,fp_,fn_],
-                              "labels" : ["True Positive","True Negative","False Positive",  "False Negative"]})
+    pie_confusion_matrix = pd.DataFrame({"values": [tp_,tn_,fp_,fn_],
+                                         "labels" : ["True Positive", "True Negative",
+                                                     "False Positive",  "False Negative"]})
+
+    return number_of_predictions, number_of_false_predictions, number_of_good_predictions, accuracy, f1_score, score_auc, pie_plotly, distrib_class, score_table, pie_confusion_matrix
+
+
+number_of_predictions, number_of_false_predictions, number_of_good_predictions,\
+accuracy, f1_score, score_auc,\
+pie_plotly, distrib_class, score_table, pie_confusion_matrix = create_charts('pipeline_baseline')
 
 ##############################################################################################################################
 # Initialization - Creation of the graphical user interface (state)
@@ -118,9 +121,6 @@ menu_lov = [("Data Visualization", Icon('images/histogram_menu.svg', 'Data Visua
             ("Compare Models", Icon('images/compare.svg', 'Compare Models')),
             ('Databases', Icon('images/Datanode.svg', 'Databases'))]
 
-width_plotly = "450px"
-height_plotly = "450px"
-
 page_markdown = """
 <|toggle|theme|>
 <|menu|label=Menu|lov={menu_lov}|on_action=menu_fct|>
@@ -128,6 +128,7 @@ page_markdown = """
 
 # the initial page is the "Scenario Manager" page
 page = "Data Visualization"
+
 def menu_fct(state,var_name:str,fct,var_value):
     """Functions that is called when there is a change in the menu control
 
@@ -144,17 +145,10 @@ def menu_fct(state,var_name:str,fct,var_value):
         print("Warning : No args were found")
     pass
 
-
-# Function for the prediction table. Bad predictions will be red and good predictions will be green (css class)
-def get_style(state, index, row):
-    return 'red' if row['Historical']!=row['Forecast'] else 'green'
-
-
 ##############################################################################################################################
 # Creation of the entire markdown
 ##############################################################################################################################
-pages = {
-         "/":page_markdown+dialog_md,
+pages = {"/":page_markdown+dialog_md,
          "Data-Visualization": dv_data_visualization_md,
          "Model-Manager": mm_model_manager_md, 
          "Compare-Models": cm_compare_models_md,
@@ -169,17 +163,14 @@ def on_init(state):
 entire_markdown = page_markdown + dialog_md
 
 # the object that will be used to generate the page
-gui = Gui(pages=pages, css_file='main')
+gui = Gui(pages=pages)
 dialog_partial_roc = gui.add_partial(dialog_roc)
 
-
-    
 ##############################################################################################################################
 # Updating displayed variables
 ##############################################################################################################################
-
-
-def update_variables(state, pipeline):
+    
+def update_variables(state, pipeline_str):
     """This function updates the different variables and dataframes used in the application.
 
     Args:
@@ -187,62 +178,25 @@ def update_variables(state, pipeline):
         pipeline (str): the name of the pipeline used to update the variables
     """
     global scenario
-    pipeline_str = 'pipeline_'+pipeline
     
     state.values = scenario.pipelines[pipeline_str].results.read()
         
     state.forecast_series = state.values['Forecast']
     state.true_series = state.values["Historical"]
-    
-    (state.number_of_predictions,
-    state.accuracy, state.f1_score, state.score_auc,
-    number_of_good_predictions, number_of_false_predictions,
-    fp_, tp_, fn_, tn_) = c_update_metrics(scenario, pipeline_str)
-    
-    
-    update_charts(state, pipeline_str, number_of_good_predictions, number_of_false_predictions, fp_, tp_, fn_, tn_)
-    
 
-
-def update_charts(state, pipeline_str, number_of_good_predictions, number_of_false_predictions, fp_, tp_, fn_, tn_):
-    """This function updates all the charts of the GUI.
-
-    Args:
-        state: object containing all the variables used in the GUI
-        pipeline_str (str): the name of the pipeline shown
-        number_of_good_predictions (int): number of good predictions
-        number_of_false_predictions (int): number of false predictions
-        fp_ (float): false positive rate
-        tp_ (float): true positive rate
-        fn_ (float): false negative rate
-        tn_ (float): true negative rate
-    """
     state.roc_dataset = scenario.pipelines[pipeline_str].roc_data.read()
     
     if 'model' in pipeline_str:
         state.features_table = scenario.pipelines['pipeline_train_model'].feature_importance.read()
     elif 'baseline' in pipeline_str:
         state.features_table = scenario.pipelines['pipeline_train_baseline'].feature_importance.read()
-
-    state.score_table = pd.DataFrame({"Score":["Predicted stayed", "Predicted exited"],
-                                      "Stayed": [tn_, fp_],
-                                      "Exited" : [fn_, tp_]})
-
-    state.pie_confusion_matrix = pd.DataFrame({"values": [tp_, tn_, fp_, fn_],
-                                               "labels" : ["True Positive", "True Negative", "False Positive", "False Negative"]})
+    
+    state.number_of_predictions, state.number_of_false_predictions, state.number_of_good_predictions,\
+    state.accuracy, state.f1_score, state.score_auc,\
+    state.pie_plotly, state.distrib_class, state.score_table, state.pie_confusion_matrix = create_charts(pipeline_str)
 
     state.scatter_dataset_pred = creation_scatter_dataset_pred(test_dataset, state.forecast_series)
     state.histo_full_pred = creation_histo_full_pred(test_dataset, state.forecast_series)
-
-    
-    # pie charts
-    state.pie_plotly = pd.DataFrame({"values": [number_of_good_predictions, number_of_false_predictions],
-                                     "labels": ["Correct predictions", "False predictions"]})
-
-    state.distrib_class = pd.DataFrame({"values": [len(state.values[state.values["Historical"]==0]),
-                                                   len(state.values[state.values["Historical"]==1])],
-                                        "labels" : ["Stayed", "Exited"]})
-
 
 ##############################################################################################################################
 # on_change function
@@ -260,12 +214,11 @@ def on_change(state, var_name, var_value):
     if var_name == 'x_selected' or var_name == 'y_selected':
         update_histogram_and_scatter(state.x_selected, state)
 
-    
     if var_name == 'mm_algorithm_selected':
         if var_value == 'Baseline':
-            update_variables(state,'baseline')
+            update_variables(state,'pipeline_baseline')
         if var_value == 'ML':
-            update_variables(state,'model')
+            update_variables(state,'pipeline_model')
     
     if (var_name == 'mm_algorithm_selected' or var_name == "db_table_selected" and state.page == 'Databases') or (var_name == 'page' and var_value == 'Databases'):
         # if we are on the 'Databases' page, we have to create an temporary csv file
@@ -287,11 +240,11 @@ def handle_temp_csv_path(state):
     if state.db_table_selected == "Training Dataset":
         train_dataset.to_csv(PATH_TO_TABLE, sep=';')
     if state.db_table_selected == "Forecast Dataset":
-        values.to_csv(PATH_TO_TABLE, sep=';')
+        state.values.to_csv(PATH_TO_TABLE, sep=';')
     
 
 ##############################################################################################################################
 # Running the Gui
 ##############################################################################################################################
 if __name__ == '__main__':
-    gui.run(title="Churn classification")
+    gui.run(title="Churn classification", dark_mode=False)
