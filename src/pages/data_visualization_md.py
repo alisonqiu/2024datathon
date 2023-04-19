@@ -6,15 +6,11 @@ dv_graph_selector = ['Histogram','Scatter']
 dv_graph_selected = dv_graph_selector[0]
 
 # Histograms dialog
-dv_dict_overlay = {'barmode':'overlay'}
-
-dv_select_x_ = ['CREDITSCORE', 'AGE', 'TENURE', 'BALANCE', 'NUMOFPRODUCTS', 'HASCRCARD', 'ISACTIVEMEMBER', 'ESTIMATEDSALARY', 'GEOGRAPHY_FRANCE', 'GEOGRAPHY_GERMANY', 'GEOGRAPHY_SPAIN', 'GENDER_MALE']
-
 properties_histo_full = {}
 properties_scatter_dataset = {}
 
 def creation_scatter_dataset(test_dataset:pd.DataFrame):
-    """This function creates the dataset for the scatter plot.  For every column (except Exited) will have a positive and negative version.
+    """This function creates the dataset for the scatter plot.  For every column (except Exited), scatter_dataset will have a positive and negative version.
     The positive column will have NaN when the Exited is zero and the negative column will have NaN when the Exited is one.
 
     Args:
@@ -40,7 +36,7 @@ def creation_scatter_dataset(test_dataset:pd.DataFrame):
 
 
 def creation_histo_full(test_dataset:pd.DataFrame):
-    """This function creates the dataset for the histogram plot.  For every column (except Exited) will have a positive and negative version.
+    """This function creates the dataset for the histogram plot.  For every column (except Exited), histo_full will have a positive and negative version.
     The positive column will have NaN when the Exited is zero and the negative column will have NaN when the Exited is one. 
 
     Args:
@@ -59,23 +55,21 @@ def creation_histo_full(test_dataset:pd.DataFrame):
         
     return histo_full
 
-def update_histogram_and_scatter(column, state=None):
-    if column == 'AGE' or column == 'CREDITSCORE' and state is not None:
-        state.dv_dict_overlay = {'barmode':'overlay'}
-    elif state is not None:
-        state.dv_dict_overlay = {}
 
-    if state is not None:
-        state.properties_scatter_dataset =  {"x":column,
-                                             "y[1]":state.y_selected+'_pos',
-                                             "y[2]":state.y_selected+'_neg'} 
-        state.scatter_dataset = state.scatter_dataset
-        state.scatter_dataset_pred = state.scatter_dataset_pred
+def update_histogram_and_scatter(state):
+    global x_selected, y_selected
+    x_selected = state.x_selected
+    y_selected = state.y_selected
+    state.properties_scatter_dataset =  {"x":x_selected,
+                                         "y[1]":y_selected+'_pos',
+                                         "y[2]":y_selected+'_neg'} 
+    state.scatter_dataset = state.scatter_dataset
+    state.scatter_dataset_pred = state.scatter_dataset_pred
 
-        state.properties_histo_full =  {"x[1]":column,
-                                        "x[2]":column+'_neg'} 
-        state.histo_full = state.histo_full
-        state.histo_full_pred = state.histo_full_pred
+    state.properties_histo_full =  {"x[1]":x_selected,
+                                    "x[2]":x_selected+'_neg'} 
+    state.histo_full = state.histo_full
+    state.histo_full_pred = state.histo_full_pred
 
 
 dv_data_visualization_md = """
@@ -88,7 +82,7 @@ dv_data_visualization_md = """
 ### Histogram
 <|{x_selected}|selector|lov={select_x}|dropdown=True|label=Select x|>
 
-<|{histo_full}|chart|type=histogram|properties={properties_histo_full}|rebuild|y=EXITED|label=EXITED|color[1]=red|color[2]=green|name[1]=Exited|name[2]=Stayed|layout={dv_dict_overlay}|height=600px|selected={[-1]}|>
+<|{histo_full}|chart|type=histogram|properties={properties_histo_full}|rebuild|y=EXITED|label=EXITED|color[1]=red|color[2]=green|name[1]=Exited|name[2]=Stayed|height=600px|>
 |>
 
 <|part|render={dv_graph_selected == 'Scatter'}|
@@ -99,7 +93,7 @@ dv_data_visualization_md = """
 <|{y_selected}|selector|lov={select_y}|dropdown|label=Select y|>
 |>
 
-<|{scatter_dataset}|chart|properties={properties_scatter_dataset}|rebuild|color[1]=red|color[2]=green|name[1]=Exited|name[2]=Stayed|mode=markers|type=scatter|layout={dv_dict_overlay}|height=600px|>
+<|{scatter_dataset}|chart|properties={properties_scatter_dataset}|rebuild|color[1]=red|color[2]=green|name[1]=Exited|name[2]=Stayed|mode=markers|type=scatter|height=600px|>
 |>
 
 """

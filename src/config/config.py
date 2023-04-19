@@ -162,7 +162,7 @@ scenario_cfg = Config.configure_scenario(id="churn_classification",
                                                            pipeline_model,pipeline_baseline],
                                          frequency=Frequency.WEEKLY)
 
-
+Config.export('config/config.toml')
 
 
 

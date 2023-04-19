@@ -1,0 +1,145 @@
+[TAIPY]
+
+[DATA_NODE.initial_dataset]
+storage_type = "csv"
+scope = "SCENARIO:SCOPE"
+path = "data/churn.csv"
+has_header = "True:bool"
+
+[DATA_NODE.date]
+scope = "SCENARIO:SCOPE"
+default_data = "None"
+
+[DATA_NODE.preprocessed_dataset]
+scope = "SCENARIO:SCOPE"
+cacheable = "True:bool"
+validity_period = "1d0h0m0s:timedelta"
+
+[DATA_NODE.train_dataset]
+scope = "SCENARIO:SCOPE"
+cacheable = "True:bool"
+validity_period = "1d0h0m0s:timedelta"
+
+[DATA_NODE.trained_model]
+scope = "SCENARIO:SCOPE"
+cacheable = "True:bool"
+validity_period = "1d0h0m0s:timedelta"
+
+[DATA_NODE.trained_model_baseline]
+scope = "SCENARIO:SCOPE"
+cacheable = "True:bool"
+validity_period = "1d0h0m0s:timedelta"
+
+[DATA_NODE.test_dataset]
+scope = "SCENARIO:SCOPE"
+cacheable = "True:bool"
+validity_period = "1d0h0m0s:timedelta"
+
+[DATA_NODE.forecast_dataset]
+scope = "PIPELINE:SCOPE"
+cacheable = "True:bool"
+validity_period = "1d0h0m0s:timedelta"
+
+[DATA_NODE.roc_data]
+scope = "PIPELINE:SCOPE"
+cacheable = "True:bool"
+validity_period = "1d0h0m0s:timedelta"
+
+[DATA_NODE.score_auc]
+scope = "PIPELINE:SCOPE"
+cacheable = "True:bool"
+validity_period = "1d0h0m0s:timedelta"
+
+[DATA_NODE.metrics]
+scope = "PIPELINE:SCOPE"
+cacheable = "True:bool"
+validity_period = "1d0h0m0s:timedelta"
+
+[DATA_NODE.feature_importance]
+scope = "PIPELINE:SCOPE"
+
+[DATA_NODE.results]
+scope = "PIPELINE:SCOPE"
+cacheable = "True:bool"
+validity_period = "1d0h0m0s:timedelta"
+
+[TASK.preprocess_dataset]
+inputs = [ "initial_dataset:SECTION", "date:SECTION",]
+function = "algos.algos.preprocess_dataset:function"
+outputs = [ "preprocessed_dataset:SECTION",]
+skippable = "True:bool"
+
+[TASK.create_train_and_test_data]
+inputs = [ "preprocessed_dataset:SECTION",]
+function = "algos.algos.create_train_test_data:function"
+outputs = [ "train_dataset:SECTION", "test_dataset:SECTION",]
+skippable = "True:bool"
+
+[TASK.train_model]
+inputs = [ "train_dataset:SECTION",]
+function = "algos.algos.train_model:function"
+outputs = [ "trained_model:SECTION", "feature_importance:SECTION",]
+skippable = "False:bool"
+
+[TASK.train_model_baseline]
+inputs = [ "train_dataset:SECTION",]
+function = "algos.algos.train_model_baseline:function"
+outputs = [ "trained_model_baseline:SECTION", "feature_importance:SECTION",]
+skippable = "False:bool"
+
+[TASK.predict_the_test_data]
+inputs = [ "test_dataset:SECTION", "trained_model:SECTION",]
+function = "algos.algos.forecast:function"
+outputs = [ "forecast_dataset:SECTION",]
+skippable = "True:bool"
+
+[TASK.predict_of_baseline]
+inputs = [ "test_dataset:SECTION", "trained_model_baseline:SECTION",]
+function = "algos.algos.forecast_baseline:function"
+outputs = [ "forecast_dataset:SECTION",]
+skippable = "True:bool"
+
+[TASK.task_roc]
+inputs = [ "forecast_dataset:SECTION", "test_dataset:SECTION",]
+function = "algos.algos.roc_from_scratch:function"
+outputs = [ "roc_data:SECTION", "score_auc:SECTION",]
+skippable = "True:bool"
+
+[TASK.task_roc_baseline]
+inputs = [ "forecast_dataset:SECTION", "test_dataset:SECTION",]
+function = "algos.algos.roc_from_scratch:function"
+outputs = [ "roc_data:SECTION", "score_auc:SECTION",]
+skippable = "True:bool"
+
+[TASK.task_create_metrics]
+inputs = [ "forecast_dataset:SECTION", "test_dataset:SECTION",]
+function = "algos.algos.create_metrics:function"
+outputs = [ "metrics:SECTION",]
+skippable = "True:bool"
+
+[TASK.task_create_results]
+inputs = [ "forecast_dataset:SECTION", "test_dataset:SECTION",]
+function = "algos.algos.create_results:function"
+outputs = [ "results:SECTION",]
+skippable = "True:bool"
+
+[PIPELINE.pipeline_preprocessing]
+tasks = [ "preprocess_dataset:SECTION", "create_train_and_test_data:SECTION",]
+
+[PIPELINE.pipeline_train_baseline]
+tasks = [ "train_model_baseline:SECTION",]
+
+[PIPELINE.pipeline_train_model]
+tasks = [ "train_model:SECTION",]
+
+[PIPELINE.pipeline_model]
+tasks = [ "predict_the_test_data:SECTION", "task_roc:SECTION", "task_create_metrics:SECTION", "task_create_results:SECTION",]
+
+[PIPELINE.pipeline_baseline]
+tasks = [ "predict_of_baseline:SECTION", "task_roc_baseline:SECTION", "task_create_metrics:SECTION", "task_create_results:SECTION",]
+
+[SCENARIO.churn_classification]
+pipelines = [ "pipeline_preprocessing:SECTION", "pipeline_train_baseline:SECTION", "pipeline_train_model:SECTION", "pipeline_model:SECTION", "pipeline_baseline:SECTION",]
+frequency = "WEEKLY:FREQUENCY"
+
+[SCENARIO.churn_classification.comparators]

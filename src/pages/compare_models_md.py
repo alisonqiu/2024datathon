@@ -37,7 +37,7 @@ def c_update_metrics(scenario, pipeline):
 
     accuracy = np.around(metrics['accuracy'], decimals=2)
     f1_score = np.around(metrics['f1_score'], decimals=2)
-    score_auc = np.around(scenario.pipelines[pipeline].score_auc.read(),decimals=2)
+    score_auc = np.around(scenario.pipelines[pipeline].score_auc.read(), decimals=2)
     
     dict_ftpn = metrics['dict_ftpn']
     
@@ -66,7 +66,7 @@ def compare_charts(accuracies, f1_scores, scores_auc, names):
     return accuracy_graph, f1_score_graph, score_auc_graph
 
 def compare_models_baseline(scenario, pipelines):
-    """This function creates the objects (three charts) for the pipeline comparison
+    """This function creates three charts for the pipeline comparison
 
     Args:
         scenario (scenario): the selected scenario

@@ -2,20 +2,16 @@ import pandas as pd
 import numpy as np
 
 
-mm_select_x_ = ['CREDITSCORE', 'AGE', 'TENURE', 'BALANCE', 'NUMOFPRODUCTS', 'HASCRCARD', 'ISACTIVEMEMBER', 'ESTIMATEDSALARY', 'GEOGRAPHY_FRANCE', 'GEOGRAPHY_GERMANY', 'GEOGRAPHY_SPAIN', 'GENDER_MALE']
-
 mm_graph_selector_scenario = ['Metrics', 'Features', 'Histogram','Scatter']
 mm_graph_selected_scenario = mm_graph_selector_scenario[0]
 
-mm_algorithm_selector = ['Baseline','ML']
+mm_algorithm_selector = ['Baseline', 'ML']
 mm_algorithm_selected = mm_algorithm_selector[0]
 
 mm_pie_color_dict_2 = {"piecolorway":["#00D08A","#FE913C"]}
 mm_pie_color_dict_4 = {"piecolorway":["#00D08A","#81F1A0","#F3C178","#FE913C"]}
 
-
-
-mm_margin_features = {'margin': {'l': 150, 'r': 50, 'b': 50, 't': 20}}
+mm_margin_features = {'margin': {'l': 150}}
 
 def creation_scatter_dataset_pred(test_dataset:pd.DataFrame, forecast_series:pd.Series):
     """This function creates the dataset for the scatter plot for the predictions.  For every column (except EXITED) will have a positive and negative version.
@@ -74,44 +70,14 @@ def creation_histo_full_pred(test_dataset:pd.DataFrame,forecast_series:pd.Series
     return histo_full
 
 
-metrics_md = """
-### Metrics
-
-<|layout|columns=1 1 1|columns[mobile]=1|
-<|
-<|{accuracy}|indicator|value={accuracy}|min=0|max=1|>
-
-**Model accuracy**
-{: .text-center}
-
-<|{pie_plotly}|chart|title=Accuracy of predictions model|values=values|labels=labels|type=pie|layout={mm_pie_color_dict_2}|>
-|>
-
-<|
-<|{score_auc}|indicator|value={score_auc}|min=0|max=1|>
-
-**Model AUC**
-{: .text-center}
-
-<|{pie_confusion_matrix}|chart|title=Confusion Matrix|values=values|labels=labels|type=pie|layout={mm_pie_color_dict_4}|>
-|>
-
-<|
-<|{f1_score}|indicator|value={f1_score}|min=0|max=1|>
-
-**Model F1-score**
-{: .text-center}
-
-<|{distrib_class}|chart|title=Distribution between Exited and Stayed|values=values|labels=labels|type=pie|layout={mm_pie_color_dict_2}|>
-|>
-
-|>
-"""
 
 mm_model_manager_md = """
 # **Model**{: .color-primary} Manager
 
-<|layout|columns=1 1 1|
+<|layout|columns=3 2 2 2|
+<|{mm_graph_selected_scenario}|toggle|lov={mm_graph_selector_scenario}|>
+
+
 <|{mm_algorithm_selected}|selector|lov={mm_algorithm_selector}|dropdown|label=Algorithm|>
 
 <|show roc|button|on_action={lambda s: s.assign("dr_show_roc", True)}|>
@@ -119,27 +85,70 @@ mm_model_manager_md = """
 <br/> **Number of predictions:** <|{number_of_predictions}|>
 |>
 
-<br/>
-<|{mm_graph_selected_scenario}|toggle|lov={mm_graph_selector_scenario}|>
-<br/>
-
 -----------------------------------------------------------------
 
+
+
+
+
 <Metrics|part|render={mm_graph_selected_scenario == 'Metrics'}|
-"""+metrics_md+"""
+### Metrics
+
+<|layout|columns=1 1 1|columns[mobile]=1|
+<accuracy|
+<|{accuracy}|indicator|value={accuracy}|min=0|max=1|>
+
+**Model accuracy**
+{: .text-center}
+
+<|{pie_plotly}|chart|title=Accuracy of predictions model|values=values|labels=labels|type=pie|layout={mm_pie_color_dict_2}|>
+|accuracy>
+
+<score_auc|
+<|{score_auc}|indicator|value={score_auc}|min=0|max=1|>
+
+**Model AUC**
+{: .text-center}
+
+<|{pie_confusion_matrix}|chart|title=Confusion Matrix|values=values|labels=labels|type=pie|layout={mm_pie_color_dict_4}|>
+|score_auc>
+
+<f1_score|
+<|{f1_score}|indicator|value={f1_score}|min=0|max=1|>
+
+**Model F1-score**
+{: .text-center}
+
+<|{distrib_class}|chart|title=Distribution between Exited and Stayed|values=values|labels=labels|type=pie|layout={mm_pie_color_dict_2}|>
+|f1_score>
+|>
 |Metrics>
+
+
+
+
 
 <Features|part|render={mm_graph_selected_scenario == 'Features'}|
 ### Features
 <|{features_table}|chart|type=bar|y=Features|x=Importance|orientation=h|layout={mm_margin_features}|>
 |Features>
 
+
+
+
+
+
 <Histogram|part|render={mm_graph_selected_scenario == 'Histogram'}|
 ### Histogram
 <|{x_selected}|selector|lov={select_x}|dropdown|label=Select x|>
 
-<|{histo_full_pred}|chart|type=histogram|properties={properties_histo_full}|rebuild|y=PREDICTION|label=PREDICTION|color[1]=red|color[2]=green|name[1]=Good Predictions|name[2]=Bad Predictions|layout={dv_dict_overlay}|selected={[-1]}|height=600px|>
+<|{histo_full_pred}|chart|type=histogram|properties={properties_histo_full}|rebuild|y=PREDICTION|label=PREDICTION|color[1]=red|color[2]=green|name[1]=Good Predictions|name[2]=Bad Predictions|height=600px|>
 |Histogram>
+
+
+
+
+
 
 <Scatter|part|render={mm_graph_selected_scenario == 'Scatter'}|
 ### Scatter
@@ -149,6 +158,6 @@ mm_model_manager_md = """
 <|{y_selected}|selector|lov={select_y}|dropdown=True|label=Select y|>
 |>
 
-<|{scatter_dataset_pred}|chart|properties={properties_scatter_dataset}|rebuild|color[1]=red|color[2]=green|name[1]=Bad prediction|name[2]=Good prediction|mode=markers|type=scatter|layout={dv_dict_overlay}|height=600px|>
+<|{scatter_dataset_pred}|chart|properties={properties_scatter_dataset}|rebuild|color[1]=red|color[2]=green|name[1]=Bad prediction|name[2]=Good prediction|mode=markers|type=scatter|height=600px|>
 |Scatter>
 """

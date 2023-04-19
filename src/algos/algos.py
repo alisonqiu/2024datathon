@@ -211,7 +211,6 @@ def create_metrics(predictions:np.array, test_dataset:np.array):
                'number_of_good_predictions':number_of_good_predictions,
                'number_of_false_predictions':number_of_false_predictions}
     
-    print("     Creating the metrics done!")
     return metrics
 
     
