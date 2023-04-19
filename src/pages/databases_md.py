@@ -31,7 +31,7 @@ db_databases_md = """
 # Data**bases**{: .color-primary}
 
 <|layout|columns=2 2 1|
-<|{mm_algorithm_selected}|selector|lov={mm_algorithm_selector}|dropdown|label=Algorithm|>
+<|{mm_algorithm_selected}|selector|lov={mm_algorithm_selector}|dropdown|label=Algorithm|active=False|>
 
 <|{db_table_selected}|selector|lov={db_table_selector}|dropdown|label=Table|>
 
