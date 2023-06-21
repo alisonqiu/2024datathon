@@ -5,8 +5,8 @@ import numpy as np
 mm_graph_selector_scenario = ['Metrics', 'Features', 'Histogram','Scatter']
 mm_graph_selected_scenario = mm_graph_selector_scenario[0]
 
-mm_algorithm_selector = ['ML']
-mm_algorithm_selected = mm_algorithm_selector[0]
+mm_algorithm_selector = ['Baseline', 'ML']
+mm_algorithm_selected = 'ML'
 
 mm_pie_color_dict_2 = {"piecolorway":["#00D08A","#FE913C"]}
 mm_pie_color_dict_4 = {"piecolorway":["#00D08A","#81F1A0","#F3C178","#FE913C"]}
@@ -78,7 +78,7 @@ mm_model_manager_md = """
 <|{mm_graph_selected_scenario}|toggle|lov={mm_graph_selector_scenario}|>
 
 
-<|{mm_algorithm_selected}|selector|lov={mm_r}|dropdown|label=Algorithm|>
+<|{mm_algorithm_selected}|selector|lov={mm_algorithm_selector}|dropdown|label=Algorithm|>
 
 <|show roc|button|on_action={lambda s: s.assign("dr_show_roc", True)}|>
 

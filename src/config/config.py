@@ -1,5 +1,5 @@
 from algos.algos import *
-from taipy import Config
+from taipy import Config, Scope
 ##############################################################################################################################
 # Creation of the datanodes
 ##############################################################################################################################
@@ -20,16 +20,17 @@ preprocessed_dataset = Config.configure_data_node(id="preprocessed_dataset")
 train_dataset = Config.configure_data_node(id="train_dataset")
 
 # the final datanode that contains the processed data
-trained_model = Config.configure_data_node(id="trained_model")
+trained_model = Config.configure_data_node(id="trained_model", scope=Scope.PIPELINE)
+
 
 # the final datanode that contains the processed data
-test_dataset = Config.configure_data_node(id="test_dataset")
-forecast_dataset = Config.configure_data_node(id="forecast_dataset")
-roc_data = Config.configure_data_node(id="roc_data")
-score_auc = Config.configure_data_node(id="score_auc")
-metrics = Config.configure_data_node(id="metrics")
-feature_importance_cfg = Config.configure_data_node(id="feature_importance")
-results = Config.configure_data_node(id="results")
+test_dataset = Config.configure_data_node(id="test_dataset", scope=Scope.PIPELINE)
+forecast_dataset = Config.configure_data_node(id="forecast_dataset", scope=Scope.PIPELINE)
+roc_data = Config.configure_data_node(id="roc_data", scope=Scope.PIPELINE)
+score_auc = Config.configure_data_node(id="score_auc", scope=Scope.PIPELINE)
+metrics = Config.configure_data_node(id="metrics", scope=Scope.PIPELINE)
+feature_importance_cfg = Config.configure_data_node(id="feature_importance", scope=Scope.PIPELINE)
+results = Config.configure_data_node(id="results", scope=Scope.PIPELINE)
 
 
 ##############################################################################################################################
@@ -53,11 +54,18 @@ task_create_train_test = Config.configure_task(id="create_train_and_test_data",
 
 
 # train_dataset --> create train_model data --> trained_model
-task_train_model = Config.configure_task(id="train_model",
+task_train_model_baseline = Config.configure_task(id="train_model",
                                          input=train_dataset,
-                                         function=train_model,
+                                         function=train_model_baseline,
                                          output=[trained_model,feature_importance_cfg])
-                                   
+        
+# train_dataset --> create train_model data --> trained_model
+task_train_model_ml = Config.configure_task(id="train_model_ml",
+                                         input=train_dataset,
+                                         function=train_model_ml,
+                                         output=[trained_model,feature_importance_cfg])
+                   
+
 # test_dataset --> forecast --> forecast_dataset
 task_forecast = Config.configure_task(id="predict_the_test_data",
                                       input=[test_dataset, trained_model],
@@ -89,9 +97,17 @@ task_create_results = Config.configure_task(id="task_create_results",
 ##############################################################################################################################
 
 # configuration of the pipeline and scenario
-pipeline_train_model = Config.configure_pipeline(id="pipeline_train_model", task_configs=[task_train_model])
 
-pipeline_model = Config.configure_pipeline(id="pipeline_model", task_configs=[task_preprocess_dataset,
+pipeline_model = Config.configure_pipeline(id="pipeline_model", task_configs=[task_train_model_ml,
+                                                                              task_preprocess_dataset,
+                                                                              task_create_train_test,
+                                                                              task_forecast,
+                                                                              task_roc,
+                                                                              task_create_metrics,
+                                                                              task_create_results])
+
+pipeline_baseline = Config.configure_pipeline(id="pipeline_baseline", task_configs=[task_train_model_baseline,
+                                                                              task_preprocess_dataset,
                                                                               task_create_train_test,
                                                                               task_forecast,
                                                                               task_roc,
@@ -101,38 +117,7 @@ pipeline_model = Config.configure_pipeline(id="pipeline_model", task_configs=[ta
 
 # the scenario will run the pipelines
 scenario_cfg = Config.configure_scenario(id="churn_classification",
-                                         pipeline_configs=[ pipeline_train_model,
+                                         pipeline_configs=[ pipeline_baseline,
                                                             pipeline_model])
 
 Config.export('config/config.toml')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

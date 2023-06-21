@@ -71,7 +71,25 @@ def create_train_test_data(preprocessed_dataset: pd.DataFrame):
 
 
 
-def train_model(train_dataset: pd.DataFrame):
+def train_model_baseline(train_dataset: pd.DataFrame):
+    """Function to train the Logistic Regression model
+
+    Args:
+        train_dataset (pd.DataFrame): the training dataset
+
+    Returns:
+        model (LogisticRegression): the fitted model
+    """
+    print("     Training the model...\n")
+    X,y = train_dataset.iloc[:,:-1],train_dataset.iloc[:,-1]
+    model_fitted = LogisticRegression().fit(X,y)
+    print("\n    ",model_fitted," is trained!")
+    
+    importance_dict = {'Features' : X.columns, 'Importance':model_fitted.coef_[0]}
+    importance = pd.DataFrame(importance_dict).sort_values(by='Importance',ascending=True)
+    return model_fitted, importance
+
+def train_model_ml(train_dataset: pd.DataFrame):
     """Function to train the Logistic Regression model
 
     Args:
