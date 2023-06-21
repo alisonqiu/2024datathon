@@ -70,6 +70,7 @@ def create_train_test_data(preprocessed_dataset: pd.DataFrame):
     return train_data, test_data
 
 
+
 def train_model_baseline(train_dataset: pd.DataFrame):
     """Function to train the Logistic Regression model
 
@@ -88,7 +89,7 @@ def train_model_baseline(train_dataset: pd.DataFrame):
     importance = pd.DataFrame(importance_dict).sort_values(by='Importance',ascending=True)
     return model_fitted, importance
 
-def train_model(train_dataset: pd.DataFrame):
+def train_model_ml(train_dataset: pd.DataFrame):
     """Function to train the Logistic Regression model
 
     Args:
@@ -123,22 +124,6 @@ def forecast(test_dataset: pd.DataFrame, trained_model: RandomForestClassifier):
     print("     Forecasting done!")
     return predictions
 
-
-def forecast_baseline(test_dataset: pd.DataFrame, trained_model: LogisticRegression):
-    """Function to forecast the test dataset
-
-    Args:
-        test_dataset (pd.DataFrame): the test dataset
-        trained_model (LogisticRegression): the fitted model
-
-    Returns:
-        forecast (pd.DataFrame): the forecasted dataset
-    """
-    print("     Forecasting the test dataset...")
-    X,y = test_dataset.iloc[:,:-1],test_dataset.iloc[:,-1]
-    predictions = trained_model.predict_proba(X)[:, 1]
-    print("     Forecasting done!")
-    return predictions
 
 def roc_from_scratch(probabilities, test_dataset, partitions=100):
     print("     Calculation of the ROC curve...")
@@ -211,7 +196,6 @@ def create_metrics(predictions:np.array, test_dataset:np.array):
                'number_of_good_predictions':number_of_good_predictions,
                'number_of_false_predictions':number_of_false_predictions}
     
-    print("     Creating the metrics done!")
     return metrics
 
     
