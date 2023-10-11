@@ -1,5 +1,4 @@
 [TAIPY]
-read_entity_retry = "3:int"
 
 [DATA_NODE.initial_dataset]
 storage_type = "csv"
@@ -13,29 +12,35 @@ default_data = "None"
 
 [DATA_NODE.train_dataset]
 
-[DATA_NODE.trained_model]
-scope = "PIPELINE:SCOPE"
+[DATA_NODE.trained_model_ml]
+
+[DATA_NODE.trained_model_baseline]
 
 [DATA_NODE.test_dataset]
-scope = "PIPELINE:SCOPE"
 
-[DATA_NODE.forecast_dataset]
-scope = "PIPELINE:SCOPE"
+[DATA_NODE.forecast_dataset_ml]
 
-[DATA_NODE.roc_data]
-scope = "PIPELINE:SCOPE"
+[DATA_NODE.forecast_dataset_baseline]
 
-[DATA_NODE.score_auc]
-scope = "PIPELINE:SCOPE"
+[DATA_NODE.roc_data_ml]
 
-[DATA_NODE.metrics]
-scope = "PIPELINE:SCOPE"
+[DATA_NODE.roc_data_baseline]
 
-[DATA_NODE.feature_importance]
-scope = "PIPELINE:SCOPE"
+[DATA_NODE.score_auc_ml]
 
-[DATA_NODE.results]
-scope = "PIPELINE:SCOPE"
+[DATA_NODE.score_auc_baseline]
+
+[DATA_NODE.metrics_ml]
+
+[DATA_NODE.metrics_baseline]
+
+[DATA_NODE.feature_importance_ml]
+
+[DATA_NODE.feature_importance_baseline]
+
+[DATA_NODE.results_ml]
+
+[DATA_NODE.results_baseline]
 
 [TASK.preprocess_dataset]
 function = "algos.algos.preprocess_dataset:function"
@@ -49,49 +54,70 @@ inputs = [ "preprocessed_dataset:SECTION",]
 outputs = [ "train_dataset:SECTION", "test_dataset:SECTION",]
 skippable = "False:bool"
 
-[TASK.train_model]
+[TASK.train_model_baseline]
 function = "algos.algos.train_model_baseline:function"
 inputs = [ "train_dataset:SECTION",]
-outputs = [ "trained_model:SECTION", "feature_importance:SECTION",]
+outputs = [ "trained_model_baseline:SECTION", "feature_importance_baseline:SECTION",]
 skippable = "False:bool"
 
 [TASK.train_model_ml]
 function = "algos.algos.train_model_ml:function"
 inputs = [ "train_dataset:SECTION",]
-outputs = [ "trained_model:SECTION", "feature_importance:SECTION",]
+outputs = [ "trained_model_ml:SECTION", "feature_importance_ml:SECTION",]
 skippable = "False:bool"
 
-[TASK.predict_the_test_data]
+[TASK.predict_the_test_data_baseline]
 function = "algos.algos.forecast:function"
-inputs = [ "test_dataset:SECTION", "trained_model:SECTION",]
-outputs = [ "forecast_dataset:SECTION",]
+inputs = [ "test_dataset:SECTION", "trained_model_baseline:SECTION",]
+outputs = [ "forecast_dataset_baseline:SECTION",]
 skippable = "False:bool"
 
-[TASK.task_roc]
+[TASK.predict_the_test_data_ml]
+function = "algos.algos.forecast:function"
+inputs = [ "test_dataset:SECTION", "trained_model_ml:SECTION",]
+outputs = [ "forecast_dataset_ml:SECTION",]
+skippable = "False:bool"
+
+[TASK.task_roc_ml]
 function = "algos.algos.roc_from_scratch:function"
-inputs = [ "forecast_dataset:SECTION", "test_dataset:SECTION",]
-outputs = [ "roc_data:SECTION", "score_auc:SECTION",]
+inputs = [ "forecast_dataset_ml:SECTION", "test_dataset:SECTION",]
+outputs = [ "roc_data_ml:SECTION", "score_auc_ml:SECTION",]
+skippable = "False:bool"
+
+[TASK.task_roc_baseline]
+function = "algos.algos.roc_from_scratch:function"
+inputs = [ "forecast_dataset_baseline:SECTION", "test_dataset:SECTION",]
+outputs = [ "roc_data_baseline:SECTION", "score_auc_baseline:SECTION",]
+skippable = "False:bool"
+
+[TASK.task_create_metrics_baseline]
+function = "algos.algos.create_metrics:function"
+inputs = [ "forecast_dataset_baseline:SECTION", "test_dataset:SECTION",]
+outputs = [ "metrics_baseline:SECTION",]
 skippable = "False:bool"
 
 [TASK.task_create_metrics]
 function = "algos.algos.create_metrics:function"
-inputs = [ "forecast_dataset:SECTION", "test_dataset:SECTION",]
-outputs = [ "metrics:SECTION",]
+inputs = [ "forecast_dataset_ml:SECTION", "test_dataset:SECTION",]
+outputs = [ "metrics_ml:SECTION",]
 skippable = "False:bool"
 
-[TASK.task_create_results]
+[TASK.task_create_results_baseline]
 function = "algos.algos.create_results:function"
-inputs = [ "forecast_dataset:SECTION", "test_dataset:SECTION",]
-outputs = [ "results:SECTION",]
+inputs = [ "forecast_dataset_baseline:SECTION", "test_dataset:SECTION",]
+outputs = [ "results_baseline:SECTION",]
 skippable = "False:bool"
 
-[PIPELINE.pipeline_model]
-tasks = [ "train_model_ml:SECTION", "preprocess_dataset:SECTION", "create_train_and_test_data:SECTION", "predict_the_test_data:SECTION", "task_roc:SECTION", "task_create_metrics:SECTION", "task_create_results:SECTION",]
-
-[PIPELINE.pipeline_baseline]
-tasks = [ "train_model:SECTION", "preprocess_dataset:SECTION", "create_train_and_test_data:SECTION", "predict_the_test_data:SECTION", "task_roc:SECTION", "task_create_metrics:SECTION", "task_create_results:SECTION",]
+[TASK.task_create_results_ml]
+function = "algos.algos.create_results:function"
+inputs = [ "forecast_dataset_ml:SECTION", "test_dataset:SECTION",]
+outputs = [ "results_ml:SECTION",]
+skippable = "False:bool"
 
 [SCENARIO.churn_classification]
-pipelines = [ "pipeline_baseline:SECTION", "pipeline_model:SECTION",]
+tasks = [ "task_create_metrics_baseline:SECTION", "task_create_metrics:SECTION", "task_create_results_baseline:SECTION", "task_create_results_ml:SECTION", "predict_the_test_data_baseline:SECTION", "predict_the_test_data_ml:SECTION", "task_roc_ml:SECTION", "task_roc_baseline:SECTION", "train_model_baseline:SECTION", "train_model_ml:SECTION", "preprocess_dataset:SECTION", "create_train_and_test_data:SECTION",]
+additional_data_nodes = []
 
 [SCENARIO.churn_classification.comparators]
+
+[SCENARIO.churn_classification.sequences]

@@ -127,13 +127,10 @@ mm_model_manager_md = """
 
 
 
-
 <Features|part|render={mm_graph_selected_scenario == 'Features'}|
 ### Features
 <|{features_table}|chart|type=bar|y=Features|x=Importance|orientation=h|layout={mm_margin_features}|>
 |Features>
-
-
 
 
 

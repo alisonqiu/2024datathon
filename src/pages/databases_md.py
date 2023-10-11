@@ -43,7 +43,7 @@ db_databases_md = """
 |Confusion>
 
 <Training|part|render={db_table_selected=='Training Dataset'}|
-<|{train_dataset}|table|width=100%|>
+<|{train_dataset}|table|>
 |Training>
 
 <Forecast|part|render={db_table_selected=='Forecast Dataset'}|
@@ -51,7 +51,7 @@ db_databases_md = """
 |Forecast>
 
 <test_dataset|part|render={db_table_selected=='Test Dataset'}|
-<|{test_dataset}|table|width=100%|>
+<|{test_dataset}|table|>
 |test_dataset>
 """ 
 

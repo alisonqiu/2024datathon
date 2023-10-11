@@ -19,11 +19,11 @@ cm_compare_models_md = """
 <br/>
 
 <|layout|columns=   1 1 1|columns[mobile]=1|
-<|{accuracy_graph}|chart|type=bar|x=Pipeline|y[1]=Accuracy Model|y[2]=Accuracy Baseline|title=Accuracy|""" + cm_options_md + """|>
+<|{accuracy_graph}|chart|type=bar|x=Model Type|y[1]=Accuracy Model|y[2]=Accuracy Baseline|title=Accuracy|""" + cm_options_md + """|>
 
-<|{f1_score_graph}|chart|type=bar|x=Pipeline|y[1]=F1 Score Model|y[2]=F1 Score Baseline|title=F1 Score|""" + cm_options_md + """|>
+<|{f1_score_graph}|chart|type=bar|x=Model Type|y[1]=F1 Score Model|y[2]=F1 Score Baseline|title=F1 Score|""" + cm_options_md + """|>
 
-<|{score_auc_graph}|chart|type=bar|x=Pipeline|y[1]=AUC Score Model|y[2]=AUC Score Baseline|title=AUC Score|""" + cm_options_md + """|>
+<|{score_auc_graph}|chart|type=bar|x=Model Type|y[1]=AUC Score Model|y[2]=AUC Score Baseline|title=AUC Score|""" + cm_options_md + """|>
 
 |>
 """
@@ -46,12 +46,12 @@ def compare_charts(accuracies, f1_scores, scores_auc, names):
 
     return accuracy_graph, f1_score_graph, score_auc_graph
 
-def compare_models_baseline(scenario,pipelines):
-    """This function creates the objects for the pipeline comparison
+def compare_models_baseline(scenario,model_types):
+    """This function creates the objects for the model comparison
 
     Args:
         scenario (scenario): the selected scenario
-        pipelines (str): the name of the selected pipeline
+        model_types (str): the name of the selected model type
 
     Returns:
         pd.DataFrame: the resulting three pd.DataFrame
@@ -60,20 +60,20 @@ def compare_models_baseline(scenario,pipelines):
     f1_scores = []
     scores_auc = []
     names = []
-    for pipeline in pipelines:
-        (_,accuracy,f1_score,score_auc,_,_,_,_,_,_) = c_update_metrics(scenario, pipeline)
+    for model_type in model_types:
+        (_,accuracy,f1_score,score_auc,_,_,_,_,_,_) = c_update_metrics(scenario, model_type)
         
         accuracies.append(accuracy)
         f1_scores.append(f1_score)
         scores_auc.append(score_auc)
-        names.append(pipeline[9:])
+        names.append('Model' if model_type != "baseline" else "Baseline") 
         
     accuracy_graph,f1_score_graph, score_auc_graph = compare_charts(accuracies, f1_scores, scores_auc, names)
     return accuracy_graph, f1_score_graph, score_auc_graph
     
 
 def create_metric_dict(metric, metric_name, names):
-    """This function creates a dictionary of metrics for mutliple pipelines that will be used in a Dataframe shown on the Gui
+    """This function creates a dictionary of metrics for multiple models that will be used in a Dataframe shown on the Gui
 
     Args:
         metric (list): the value of the metric
@@ -86,7 +86,7 @@ def create_metric_dict(metric, metric_name, names):
     metric_dict = {}
     initial_list = [0]*len(names)
     
-    metric_dict["Pipeline"] = names
+    metric_dict["Model Type"] = names
     for i in range(len(names)):
         current_list = initial_list.copy()
         
@@ -95,17 +95,17 @@ def create_metric_dict(metric, metric_name, names):
         
     return metric_dict
 
-def c_update_metrics(scenario, pipeline):
-    """This function updates the metrics of a scenario using a pipeline
+def c_update_metrics(scenario, model_type):
+    """This function updates the metrics of a scenario using a model
 
     Args:
         scenario (scenario): the selected scenario
-        pipeline (str): the name of the selected pipeline
+        model_type (str): the name of the selected model_type
 
     Returns:
         obj: a number of values, lists that represent the metrics
     """
-    metrics = scenario.pipelines[pipeline].metrics.read()
+    metrics = scenario.data_nodes[f'metrics_{model_type}'].read()
 
     number_of_predictions = metrics['number_of_predictions']
     number_of_good_predictions = metrics['number_of_good_predictions']
@@ -113,7 +113,7 @@ def c_update_metrics(scenario, pipeline):
 
     accuracy = np.around(metrics['accuracy'], decimals=2)
     f1_score = np.around(metrics['f1_score'], decimals=2)
-    score_auc = np.around(scenario.pipelines[pipeline].score_auc.read(), decimals=2)
+    score_auc = np.around(scenario.data_nodes[f'score_auc_{model_type}'].read(), decimals=2)
     
     dict_ftpn = metrics['dict_ftpn']
     
