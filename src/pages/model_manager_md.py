@@ -72,9 +72,9 @@ def creation_histo_full_pred(test_dataset:pd.DataFrame,forecast_series:pd.Series
 
 
 mm_model_manager_md = """
-# **Model**{: .color-primary} Manager
+# **Mo**{: .color-primary}del Manager
 
-<|layout|columns=3 2 2 2|
+<|layout|columns=4 1 2 2|
 <|{mm_graph_selected_scenario}|toggle|lov={mm_graph_selector_scenario}|>
 
 

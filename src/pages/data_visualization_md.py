@@ -4,6 +4,7 @@ import numpy as np
 
 dv_graph_selector = ['Histogram','Scatter']
 dv_graph_selected = dv_graph_selector[0]
+chev = "../images/chevron.png"
 
 # Histograms dialog
 properties_histo_full = {}
@@ -73,13 +74,16 @@ def update_histogram_and_scatter(state):
 
 
 dv_data_visualization_md = """
-# Data **Visualization**{: .color-primary}
-<|{dv_graph_selected}|toggle|lov={dv_graph_selector}|>
 
+#  <div align="center"><|{chev}|image|>**𐔳**{: .color-secondary } Data Visualization **𐔳**{: .color-secondary }</div>
+
+<center>
+<|{dv_graph_selected}|toggle|lov={dv_graph_selector}|>
+</center>
 --------------------------------------------------------------------
 
 <|part|render={dv_graph_selected == 'Histogram'}|
-### Histogram
+###Histogram
 <|{x_selected}|selector|lov={select_x}|dropdown=True|label=Select x|>
 
 <|{histo_full}|chart|type=histogram|properties={properties_histo_full}|rebuild|y=EXITED|label=EXITED|color[1]=red|color[2]=green|name[1]=Exited|name[2]=Stayed|height=600px|>

@@ -1,6 +1,20 @@
+:root {
+    --color-success: "#96E6B3";
+    --color-background-light: #8c93f7 !important;
+    background-color:#8c93f7 !important;
+    --color-paper-light: rgb(248, 250, 237) !important;
+    --font-family: "Georgia, serif" !important;
+}
+  
 .red_color td{
     background-color: rgb(255, 155, 155) !important;
 }
 .green_color td{
     background-color: rgb(171, 255, 171) !important;
+}
+
+.taipy-image {
+    display: block;
+    transform: translate(0px, 10px); 
+    max-width: 50px !important;
 }

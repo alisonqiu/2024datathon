@@ -174,4 +174,4 @@ pages = {
 # Run the GUI
 if __name__ == '__main__':
     gui = Gui(pages=pages)
-    gui.run(title="Churn classification", dark_mode=False, port=8494)
+    gui.run(title="Churn classification",  dark_mode=False, port=8494)
