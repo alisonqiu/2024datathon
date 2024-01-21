@@ -1,101 +1,28 @@
-# Demo Churn Classification
+# Peak-ProphetPro
+## Inspiration
+Peak-ProphetPro was inspired by the Chevron challenge, focusing on predicting peak oil production across various well profiles.
 
-## Usage
-- [Usage](#usage)
-- [Demo Churn classification](#what-is-demo-churn-classification)
-- [Directory Structure](#directory-structure)
-- [License](#license)
-- [Installation](#installation)
-- [Contributing](#contributing)
-- [Code of conduct](#code-of-conduct)
-
-## What is demo churn classification
-
-Taipy is a Python library for creating Business Applications. More information on our
-[website](https://www.taipy.io).
-
-[Demo Churn Classification](https://github.com/Avaiga/demo-churn-classification) is a demo that predicts the customer churn for a company. Predicting which customers are likely to leave the company has become an essential process. The demo provides different pages to display the input data as well as the results of the Churn prediction. Here two models have been used:
-
-- A logistic Regression model referred to as the ‘Baseline’
-- A Random Forest Model referred as ‘ML”
-
-A training dataset and test dataset are prepared from a provided dataset. Many features are being used from Credit Score, Age, Tenure, etc. The target variable is a boolean field named “Exited”.
-
-### Demo Type
-
-**Level**: Advanced
-
-**Topic**: Taipy-GUI, Taipy-Core
-
-**Components**: Many common Taipy-Core and Taipy-GUI functions
-
-Full application showing how Taipy Core and Taipy Gui can work together to build a minimalist but powerful application. A lot of the Taipy controls are being used. 
-
-The demo shows how to use scenarios, pipelines and how to compare the two pipelines.
-
-### Data Visualization
-
-<p align="center">
-  <img src="docs/image16.png" alt="drawing" width="700"/>
-</p>
-
-This is the first page of the application, which allows the users to perform some level of EDA (Exploratory Data Analysis). 
-The user can select the type of graph (scatter plot or histogram)  and the data content (the input data to be displayed).
-
-### Model Manager
-
-By clicking on the <img src="docs/image15.png" alt="drawing" width="30"/> icon on the left panel, you will see the results of the performance of the selected model/algorithm.
-
-By selecting the algorithm as well as the type of chart, you will be able to visualize the results of the predictions (on a validation dataset).
-
-### Comparing Models
-By clicking on the <img src="docs/image3.png" alt="drawing" width="30"/> icon on the left panel, you will get to another page displaying the performance of the 2 models side by side.
-
-### Databases
-By clicking on <img src="docs/image8.png" alt="drawing" width="30"/> icon, you can display:
-
-- The training dataset
-- The test data set
-- The forecast/scoring (based on the test data set) of the selected algorithm/model. You can notice that the correct prediction are highlighter in green where the wrong predictions are highlight in red).
-- The Confusion Matrix of the selected algo/model.
-
-A ‘Download’ button is present to download the specified data frame as a CSV file.
+## What it does
+Peak-ProphetPro has not only a Neural Network for predicting peak oil production, but also a fullstack data visualization dashboard using Taipy! This dashboard allows users to examine the dataset and generate dynamic graphs, including heatmaps, scatter plots, and histograms.
 
 
-## Directory Structure
+![ScreenRecording2024-01-20at3 53 55PM-ezgif com-video-to-gif-converter](https://github.com/alisonqiu/2024datathon/assets/90943803/12123ff8-0636-430b-a0bb-1d7a5a3643e9)
 
-- `src/`: Contains the demo source code.
-  - `src/algos`: Contains the functions to be executed as tasks by Taipy.
-  - `src/config`: Contains the configuration files.
-  - `src/data`: Contains the application data files.
-  - `src/images`: Contains the application image files.
-  - `src/pages`: Contains the page definition files.
-- `CODE_OF_CONDUCT.md`: Code of conduct for members and contributors of _demo-churn-classification_.
-- `CONTRIBUTING.md`: Instructions to contribute to _demo-churn-classification_.
-- `INSTALLATION.md`: Instructions to install _demo-churn-classification_.
-- `LICENSE`: The Apache 2.0 License.
-- `Pipfile`: File used by the Pipenv virtual environment to manage project dependencies.
-- `README.md`: Current file.
 
-## License
-Copyright 2022 Avaiga Private Limited
+## How we built it
+### Handling Missing Values:
+We addressed missing values by identifying rows without missing target values and assessing the proportion of missing values in specific variables. For instance, we dropped the 'frac_type' variable because all rows with non-missing target values had the same 'frac_type,' making it irrelevant for the model's learning process.
 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
-the License. You may obtain a copy of the License at
-[http://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
+### Imputing Numerical Values:
+To decide between using the mean or median for imputing numerical values, we examined data distributions. Since the data distribution was skewed or contained outliers, we opted for the median, which is more suitable when dealing with asymmetric distributions or outliers.
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
-an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
-specific language governing permissions and limitations under the License.
+### Imputing Categorical Variables:
+We decided against the common way of replacing missing values in categorical variables because there is no significant differences between the top few frequencies. We tried random sampling, and we later improved our performance by building a predictive model to impute missing values.
 
-## Installation
+### Modeling:
+We built four baseline models (Linear Regression, Decision Trees, Random Forest, XGBoost) and an ensemble of Random Forest and XGBoost. The final model with best performance a Neural Network with four hidden layers. We used L2 regularization to address the correlation among features, allowing shared weights over sparse models produced by L1 regularization. We also added Dropout and Early Stopping to prevent overfitting.
+<img width="1050" alt="Screenshot 2024-01-20 at 8 02 49 PM" src="https://github.com/alisonqiu/2024datathon/assets/90943803/2af72c2e-2a41-4ef7-9d2e-5336cbbf4424">
 
-Want to install _demo-churn-classification_? Check out our [`INSTALLATION.md`](INSTALLATION.md) file.
+## What's next for Peak-ProphetPro
+Although we wrote the code for model training prediction, we didn't have time to add it as a webpage,  so we will integrate the model training prediction and management functionality into the taipy visualization tool! 
 
-## Contributing
-
-Want to help build _demo-churn-classification_? Check out our [`CONTRIBUTING.md`](CONTRIBUTING.md) file.
-
-## Code of conduct
-
-Want to be part of the _demo-churn-classification_ community? Check out our [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) file.
