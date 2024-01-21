@@ -20,7 +20,7 @@ To decide between using the mean or median for imputing numerical values, we exa
 We decided against the common way of replacing missing values in categorical variables because there is no significant differences between the top few frequencies. We tried random sampling, and we later improved our performance by building a predictive model to impute missing values.
 
 ### Modeling:
-We built four baseline models (Linear Regression, Decision Trees, Random Forest, XGBoost) and an ensemble of Random Forest and XGBoost. The final model with best performance a Neural Network with four hidden layers. We used L2 regularization to address the correlation among features, allowing shared weights over sparse models produced by L1 regularization. We also added Dropout and Early Stopping to prevent overfitting.
+We built four baseline models (Linear Regression, Decision Trees, Random Forest, XGBoost) and an ensemble of Random Forest and XGBoost. We also built a Neural Network with four hidden layers. The final model with best performance is a Stacking Ensemble. The ensemble consists of three base models: RandomForestRegressor, XGBRegressor and LinearRegression. These models are combined using a StackingRegressor with a final estimator being another Linear Regression model.
 <img width="1050" alt="Screenshot 2024-01-20 at 8 02 49 PM" src="https://github.com/alisonqiu/2024datathon/assets/90943803/2af72c2e-2a41-4ef7-9d2e-5336cbbf4424">
 
 ## What's next for Peak-ProphetPro
