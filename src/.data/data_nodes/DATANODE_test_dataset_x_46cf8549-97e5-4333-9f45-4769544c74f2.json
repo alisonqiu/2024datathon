@@ -1,0 +1,29 @@
+{
+"id": "DATANODE_test_dataset_x_46cf8549-97e5-4333-9f45-4769544c74f2",
+"config_id": "test_dataset_x",
+"scope": "<Scope.SCENARIO: 1>",
+"storage_type": "pickle",
+"name": null,
+"owner_id": "SCENARIO_churn_classification_4d1bd43b-804d-4af7-b98c-1e87f6fff734",
+"parent_ids": [
+"TASK_train_model_baseline_31956e5c-4d10-4e10-b19d-dfde2c466b30",
+"TASK_create_train_and_test_data_998be694-408b-4c0d-987f-b704112ba0bb",
+"TASK_train_model_ml_34aa5a18-d3e8-43c5-b4d8-14a0da1153b8"
+],
+"last_edit_date": "2024-01-20T15:49:12.074673",
+"edits": [
+{
+"job_id": "JOB_create_train_and_test_data_cf4641cf-0753-4196-97be-7cbec5e9e86b",
+"timestamp": "2024-01-20T15:49:12.074673"
+}
+],
+"version": "d8e2ea98-9211-4431-95c2-57a9cb3b0ccb",
+"validity_days": null,
+"validity_seconds": null,
+"edit_in_progress": false,
+"editor_id": null,
+"editor_expiration_date": null,
+"data_node_properties": {
+"is_generated": true
+}
+}

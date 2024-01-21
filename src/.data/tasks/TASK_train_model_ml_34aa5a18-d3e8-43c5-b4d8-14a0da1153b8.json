@@ -1,0 +1,24 @@
+{
+"id": "TASK_train_model_ml_34aa5a18-d3e8-43c5-b4d8-14a0da1153b8",
+"owner_id": "SCENARIO_churn_classification_4d1bd43b-804d-4af7-b98c-1e87f6fff734",
+"parent_ids": [
+"SCENARIO_churn_classification_4d1bd43b-804d-4af7-b98c-1e87f6fff734"
+],
+"config_id": "train_model_ml",
+"input_ids": [
+"DATANODE_train_dataset_x_d144cdfe-c093-4618-9143-53fc912c5695",
+"DATANODE_test_dataset_x_46cf8549-97e5-4333-9f45-4769544c74f2",
+"DATANODE_train_dataset_y_1c4c0501-291d-4d6e-887b-431437f9e98a",
+"DATANODE_test_dataset_y_1d4f2e8f-5279-4cf7-93a4-8f2e63709782"
+],
+"function_name": "train_model_ml",
+"function_module": "algos.algos",
+"output_ids": [
+"DATANODE_trained_model_ml_5bab1cc0-e28d-4868-8cf6-d53c556ff4b3",
+"DATANODE_RMSE_ml_d2bbfc9d-21b3-46a4-b465-575eb94184da",
+"DATANODE_forecast_dataset_baseline_6bb8e2c2-323b-4f0b-a386-5f72e393d2c4"
+],
+"version": "d8e2ea98-9211-4431-95c2-57a9cb3b0ccb",
+"skippable": false,
+"properties": {}
+}

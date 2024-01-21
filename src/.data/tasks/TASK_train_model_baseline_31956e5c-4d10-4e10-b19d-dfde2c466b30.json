@@ -1,0 +1,24 @@
+{
+"id": "TASK_train_model_baseline_31956e5c-4d10-4e10-b19d-dfde2c466b30",
+"owner_id": "SCENARIO_churn_classification_4d1bd43b-804d-4af7-b98c-1e87f6fff734",
+"parent_ids": [
+"SCENARIO_churn_classification_4d1bd43b-804d-4af7-b98c-1e87f6fff734"
+],
+"config_id": "train_model_baseline",
+"input_ids": [
+"DATANODE_train_dataset_x_d144cdfe-c093-4618-9143-53fc912c5695",
+"DATANODE_test_dataset_x_46cf8549-97e5-4333-9f45-4769544c74f2",
+"DATANODE_train_dataset_y_1c4c0501-291d-4d6e-887b-431437f9e98a",
+"DATANODE_test_dataset_y_1d4f2e8f-5279-4cf7-93a4-8f2e63709782"
+],
+"function_name": "train_model_baseline",
+"function_module": "algos.algos",
+"output_ids": [
+"DATANODE_trained_model_baseline_690db3f7-513d-4905-bc7f-8be64bd5a840",
+"DATANODE_RMSE_baseline_ba1bf925-8a4b-4f24-9207-48f31052f06c",
+"DATANODE_forecast_dataset_ml_eca1e393-3d77-4712-85a6-90606c104be6"
+],
+"version": "d8e2ea98-9211-4431-95c2-57a9cb3b0ccb",
+"skippable": false,
+"properties": {}
+}

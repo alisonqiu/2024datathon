@@ -1,0 +1,18 @@
+{
+"id": "SCENARIO_churn_classification_4d1bd43b-804d-4af7-b98c-1e87f6fff734",
+"config_id": "churn_classification",
+"tasks": [
+"TASK_train_model_baseline_31956e5c-4d10-4e10-b19d-dfde2c466b30",
+"TASK_create_train_and_test_data_998be694-408b-4c0d-987f-b704112ba0bb",
+"TASK_train_model_ml_34aa5a18-d3e8-43c5-b4d8-14a0da1153b8"
+],
+"additional_data_nodes": [],
+"properties": {},
+"creation_date": "2024-01-20T15:49:11.934492",
+"primary_scenario": false,
+"subscribers": [],
+"tags": [],
+"version": "d8e2ea98-9211-4431-95c2-57a9cb3b0ccb",
+"sequences": null,
+"cycle": null
+}

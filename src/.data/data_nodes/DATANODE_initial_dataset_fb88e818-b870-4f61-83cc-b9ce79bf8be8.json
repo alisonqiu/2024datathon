@@ -1,0 +1,25 @@
+{
+"id": "DATANODE_initial_dataset_fb88e818-b870-4f61-83cc-b9ce79bf8be8",
+"config_id": "initial_dataset",
+"scope": "<Scope.SCENARIO: 1>",
+"storage_type": "csv",
+"name": null,
+"owner_id": "SCENARIO_churn_classification_4d1bd43b-804d-4af7-b98c-1e87f6fff734",
+"parent_ids": [
+"TASK_create_train_and_test_data_998be694-408b-4c0d-987f-b704112ba0bb"
+],
+"last_edit_date": "2024-01-20T15:49:11.923943",
+"edits": [],
+"version": "d8e2ea98-9211-4431-95c2-57a9cb3b0ccb",
+"validity_days": null,
+"validity_seconds": null,
+"edit_in_progress": false,
+"editor_id": null,
+"editor_expiration_date": null,
+"data_node_properties": {
+"path": "data/cleaned.csv",
+"has_header": true,
+"encoding": "utf-8",
+"exposed_type": "pandas"
+}
+}

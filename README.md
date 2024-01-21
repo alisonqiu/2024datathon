@@ -19,7 +19,7 @@ Taipy is a Python library for creating Business Applications. More information o
 - A logistic Regression model referred to as the ‘Baseline’
 - A Random Forest Model referred as ‘ML”
 
-A training dataset and test dataset are prepared from a provided dataset. Many features are being used from Credit Score, Age, Tenure, etc. The target variable is a boolean field named “Exited”.
+A training dataset and test dataset are prepared from a provided dataset. Many features are being used from Credit Score, Age, Tenure, etc. The target variable is a boolean field named “OilPeakRate”.
 
 ### Demo Type
 

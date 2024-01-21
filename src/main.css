@@ -1,20 +1,29 @@
 :root {
     --color-success: "#96E6B3";
-    --color-background-light: #8c93f7 !important;
-    background-color:#8c93f7 !important;
+    --color-background-light: #2FA2CE!important;
+    background-color:#2FA2CE!important;
     --color-paper-light: rgb(248, 250, 237) !important;
     --font-family: "Georgia, serif" !important;
 }
   
 .red_color td{
-    background-color: rgb(255, 155, 155) !important;
+    background-color: #f15a69 !important;
 }
 .green_color td{
-    background-color: rgb(171, 255, 171) !important;
+    background-color: #2FA2CE !important;
 }
 
 .taipy-image {
-    display: block;
+    display: inline;
     transform: translate(0px, 10px); 
     max-width: 50px !important;
+}
+
+.taipy-menu {
+    color: #2FA2CE !important;
+}
+
+#biglogo {
+    max-width: 100px !important;
+    transform: translate(0px, 40px); 
 }

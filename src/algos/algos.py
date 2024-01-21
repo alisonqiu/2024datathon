@@ -1,7 +1,13 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+import xgboost as xgb
+from sklearn.metrics import mean_squared_error
+from math import sqrt
 
 import datetime as dt
 
@@ -31,7 +37,7 @@ def preprocess_dataset(initial_dataset: pd.DataFrame, date: dt.datetime="None"):
     else:
         processed_dataset = initial_dataset
         
-    processed_dataset = processed_dataset[['CreditScore','Geography','Gender','Age','Tenure','Balance','NumOfProducts','HasCrCard','IsActiveMember','EstimatedSalary','Exited']]
+    processed_dataset = processed_dataset[['CreditScore','Geography','Gender','Age','Tenure','Balance','NumOfProducts','HasCrCard','IsActiveMember','EstimatedSalary','OilPeakRate']]
     
     
     processed_dataset = pd.get_dummies(processed_dataset)
@@ -43,7 +49,7 @@ def preprocess_dataset(initial_dataset: pd.DataFrame, date: dt.datetime="None"):
     
     columns_to_select = ['CreditScore', 'Age', 'Tenure', 'Balance', 'NumOfProducts', 'HasCrCard',
                          'IsActiveMember', 'EstimatedSalary',  'Geography_France', 'Geography_Germany',
-                         'Geography_Spain',  'Gender_Male','Exited']
+                         'Geography_Spain',  'Gender_Male','OilPeakRate']
     
     processed_dataset = processed_dataset[[col for col in columns_to_select if col in processed_dataset.columns]]
 
@@ -62,16 +68,23 @@ def create_train_test_data(preprocessed_dataset: pd.DataFrame):
     """
     print("\n     Creating the training and testing dataset...")
     
-    X_train, X_test, y_train, y_test = train_test_split(preprocessed_dataset.iloc[:,:-1],preprocessed_dataset.iloc[:,-1],test_size=0.2,random_state=42)
-    
+    X = preprocessed_dataset.drop('OilPeakRate', axis=1)
+    y = preprocessed_dataset['OilPeakRate']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     train_data = pd.concat([X_train,y_train],axis=1)
     test_data = pd.concat([X_test,y_test],axis=1)
+
+
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+        
     print("     Creating done!")
-    return train_data, test_data
+    return X_train, X_test, y_train, y_test, train_data, test_data
 
 
-
-def train_model_baseline(train_dataset: pd.DataFrame):
+def train_model_baseline(X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame, y_test: pd.DataFrame):
     """Function to train the Logistic Regression model
 
     Args:
@@ -81,15 +94,15 @@ def train_model_baseline(train_dataset: pd.DataFrame):
         model (LogisticRegression): the fitted model
     """
     print("     Training the model...\n")
-    X,y = train_dataset.iloc[:,:-1],train_dataset.iloc[:,-1]
-    model_fitted = LogisticRegression().fit(X,y)
-    print("\n    ",model_fitted," is trained!")
-    
-    importance_dict = {'Features' : X.columns, 'Importance':model_fitted.coef_[0]}
-    importance = pd.DataFrame(importance_dict).sort_values(by='Importance',ascending=True)
-    return model_fitted, importance
 
-def train_model_ml(train_dataset: pd.DataFrame):
+    linear_reg_model = LinearRegression()
+    linear_reg_model.fit(X_train, y_train)
+    linear_reg_predictions = linear_reg_model.predict(X_test)
+    linear_reg_rmse = sqrt(mean_squared_error(y_test, linear_reg_predictions))
+    return linear_reg_model, linear_reg_rmse, linear_reg_predictions
+
+def train_model_ml(X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame, y_test: pd.DataFrame):
+    #TODO: change algo
     """Function to train the Logistic Regression model
 
     Args:
@@ -99,13 +112,11 @@ def train_model_ml(train_dataset: pd.DataFrame):
         model (RandomForest): the fitted model
     """
     print("     Training the model...\n")
-    X,y = train_dataset.iloc[:,:-1],train_dataset.iloc[:,-1]
-    model_fitted = RandomForestClassifier().fit(X,y)
-    print("\n    ",model_fitted," is trained!")
-    
-    importance_dict = {'Features' : X.columns, 'Importance':model_fitted.feature_importances_}
-    importance = pd.DataFrame(importance_dict).sort_values(by='Importance',ascending=True)
-    return model_fitted, importance
+    linear_reg_model = LinearRegression()
+    linear_reg_model.fit(X_train, y_train)
+    linear_reg_predictions = linear_reg_model.predict(X_test)
+    linear_reg_rmse = sqrt(mean_squared_error(y_test, linear_reg_predictions))
+    return linear_reg_model, linear_reg_rmse, linear_reg_predictions
 
 def forecast(test_dataset: pd.DataFrame, trained_model: RandomForestClassifier):
     """Function to forecast the test dataset

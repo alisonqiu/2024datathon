@@ -70,6 +70,27 @@ def compare_models_baseline(scenario,model_types):
         
     accuracy_graph,f1_score_graph, score_auc_graph = compare_charts(accuracies, f1_scores, scores_auc, names)
     return accuracy_graph, f1_score_graph, score_auc_graph
+    # Decision Tree Regression
+    dt_model = DecisionTreeRegressor(random_state=42)
+    dt_model.fit(X_train, y_train)
+    dt_predictions = dt_model.predict(X_test)
+    dt_rmse = sqrt(mean_squared_error(y_test, dt_predictions))
+    print(f"Decision Tree Regression RMSE: {dt_rmse}")
+
+    # Random Forest Regression
+    rf_model = RandomForestRegressor(random_state=42)
+    rf_model.fit(X_train, y_train)
+    rf_predictions = rf_model.predict(X_test)
+    rf_rmse = sqrt(mean_squared_error(y_test, rf_predictions))
+    print(f"Random Forest Regression RMSE: {rf_rmse}")
+
+    # XGBoost Regression
+    xgb_model = xgb.XGBRegressor(random_state=42)
+    xgb_model.fit(X_train, y_train)
+    xgb_predictions = xgb_model.predict(X_test)
+    xgb_rmse = sqrt(mean_squared_error(y_test, xgb_predictions))
+    print(f"XGBoost Regression RMSE: {xgb_rmse}")
+
     
 
 def create_metric_dict(metric, metric_name, names):

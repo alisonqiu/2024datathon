@@ -2,120 +2,53 @@
 
 [DATA_NODE.initial_dataset]
 storage_type = "csv"
-path = "data/churn.csv"
+path = "data/cleaned.csv"
 has_header = "True:bool"
 
-[DATA_NODE.date]
-default_data = "None"
-
-[DATA_NODE.preprocessed_dataset]
-
 [DATA_NODE.train_dataset]
+
+[DATA_NODE.test_dataset]
+
+[DATA_NODE.train_dataset_x]
+
+[DATA_NODE.train_dataset_y]
 
 [DATA_NODE.trained_model_ml]
 
 [DATA_NODE.trained_model_baseline]
 
-[DATA_NODE.test_dataset]
+[DATA_NODE.test_dataset_x]
+
+[DATA_NODE.test_dataset_y]
 
 [DATA_NODE.forecast_dataset_ml]
 
 [DATA_NODE.forecast_dataset_baseline]
 
-[DATA_NODE.roc_data_ml]
+[DATA_NODE.RMSE_ml]
 
-[DATA_NODE.roc_data_baseline]
-
-[DATA_NODE.score_auc_ml]
-
-[DATA_NODE.score_auc_baseline]
-
-[DATA_NODE.metrics_ml]
-
-[DATA_NODE.metrics_baseline]
-
-[DATA_NODE.feature_importance_ml]
-
-[DATA_NODE.feature_importance_baseline]
-
-[DATA_NODE.results_ml]
-
-[DATA_NODE.results_baseline]
-
-[TASK.preprocess_dataset]
-function = "algos.algos.preprocess_dataset:function"
-inputs = [ "initial_dataset:SECTION", "date:SECTION",]
-outputs = [ "preprocessed_dataset:SECTION",]
-skippable = "False:bool"
+[DATA_NODE.RMSE_baseline]
 
 [TASK.create_train_and_test_data]
 function = "algos.algos.create_train_test_data:function"
-inputs = [ "preprocessed_dataset:SECTION",]
-outputs = [ "train_dataset:SECTION", "test_dataset:SECTION",]
+inputs = [ "initial_dataset:SECTION",]
+outputs = [ "train_dataset_x:SECTION", "test_dataset_x:SECTION", "train_dataset_y:SECTION", "test_dataset_y:SECTION", "train_dataset:SECTION", "test_dataset:SECTION",]
 skippable = "False:bool"
 
 [TASK.train_model_baseline]
 function = "algos.algos.train_model_baseline:function"
-inputs = [ "train_dataset:SECTION",]
-outputs = [ "trained_model_baseline:SECTION", "feature_importance_baseline:SECTION",]
+inputs = [ "train_dataset_x:SECTION", "test_dataset_x:SECTION", "train_dataset_y:SECTION", "test_dataset_y:SECTION",]
+outputs = [ "trained_model_baseline:SECTION", "RMSE_baseline:SECTION", "forecast_dataset_ml:SECTION",]
 skippable = "False:bool"
 
 [TASK.train_model_ml]
 function = "algos.algos.train_model_ml:function"
-inputs = [ "train_dataset:SECTION",]
-outputs = [ "trained_model_ml:SECTION", "feature_importance_ml:SECTION",]
-skippable = "False:bool"
-
-[TASK.predict_the_test_data_baseline]
-function = "algos.algos.forecast:function"
-inputs = [ "test_dataset:SECTION", "trained_model_baseline:SECTION",]
-outputs = [ "forecast_dataset_baseline:SECTION",]
-skippable = "False:bool"
-
-[TASK.predict_the_test_data_ml]
-function = "algos.algos.forecast:function"
-inputs = [ "test_dataset:SECTION", "trained_model_ml:SECTION",]
-outputs = [ "forecast_dataset_ml:SECTION",]
-skippable = "False:bool"
-
-[TASK.task_roc_ml]
-function = "algos.algos.roc_from_scratch:function"
-inputs = [ "forecast_dataset_ml:SECTION", "test_dataset:SECTION",]
-outputs = [ "roc_data_ml:SECTION", "score_auc_ml:SECTION",]
-skippable = "False:bool"
-
-[TASK.task_roc_baseline]
-function = "algos.algos.roc_from_scratch:function"
-inputs = [ "forecast_dataset_baseline:SECTION", "test_dataset:SECTION",]
-outputs = [ "roc_data_baseline:SECTION", "score_auc_baseline:SECTION",]
-skippable = "False:bool"
-
-[TASK.task_create_metrics_baseline]
-function = "algos.algos.create_metrics:function"
-inputs = [ "forecast_dataset_baseline:SECTION", "test_dataset:SECTION",]
-outputs = [ "metrics_baseline:SECTION",]
-skippable = "False:bool"
-
-[TASK.task_create_metrics]
-function = "algos.algos.create_metrics:function"
-inputs = [ "forecast_dataset_ml:SECTION", "test_dataset:SECTION",]
-outputs = [ "metrics_ml:SECTION",]
-skippable = "False:bool"
-
-[TASK.task_create_results_baseline]
-function = "algos.algos.create_results:function"
-inputs = [ "forecast_dataset_baseline:SECTION", "test_dataset:SECTION",]
-outputs = [ "results_baseline:SECTION",]
-skippable = "False:bool"
-
-[TASK.task_create_results_ml]
-function = "algos.algos.create_results:function"
-inputs = [ "forecast_dataset_ml:SECTION", "test_dataset:SECTION",]
-outputs = [ "results_ml:SECTION",]
+inputs = [ "train_dataset_x:SECTION", "test_dataset_x:SECTION", "train_dataset_y:SECTION", "test_dataset_y:SECTION",]
+outputs = [ "trained_model_ml:SECTION", "RMSE_ml:SECTION", "forecast_dataset_baseline:SECTION",]
 skippable = "False:bool"
 
 [SCENARIO.churn_classification]
-tasks = [ "task_create_metrics_baseline:SECTION", "task_create_metrics:SECTION", "task_create_results_baseline:SECTION", "task_create_results_ml:SECTION", "predict_the_test_data_baseline:SECTION", "predict_the_test_data_ml:SECTION", "task_roc_ml:SECTION", "task_roc_baseline:SECTION", "train_model_baseline:SECTION", "train_model_ml:SECTION", "preprocess_dataset:SECTION", "create_train_and_test_data:SECTION",]
+tasks = [ "train_model_baseline:SECTION", "train_model_ml:SECTION", "create_train_and_test_data:SECTION",]
 additional_data_nodes = []
 
 [SCENARIO.churn_classification.comparators]
